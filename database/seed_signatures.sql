@@ -278,7 +278,22 @@ INSERT OR IGNORE INTO technique_signatures (pattern, attack_technique_id, techni
 ('(?:OPTIONS\s+\/|HEAD\s+\/|TRACE\s+\/|PROPFIND\s+\/)', 'T1592', 'Gather Victim Host Information: HTTP Method Probing');
 
 INSERT OR IGNORE INTO technique_signatures (pattern, attack_technique_id, technique_name) VALUES
-('(?:GET\s+\/favicon\.ico|GET\s+\/apple-touch-icon)', 'T1592.004', 'Gather Victim Host Information: Favicon Fingerprinting');
+('^(?:HEAD|POST|PUT|DELETE|OPTIONS)\b', 'T1592.004', 'Gather Victim Network Information: Client Configurations');
+
+-- ── Generic Protocol Handshakes & Reconnaissance ────────────────────────────
+
+INSERT OR IGNORE INTO technique_signatures (pattern, attack_technique_id, technique_name) VALUES
+('^GET\b', 'T1592.004', 'Gather Victim Network Information: Client Configurations');
+
+INSERT OR IGNORE INTO technique_signatures (pattern, attack_technique_id, technique_name) VALUES
+('^AUTH\s+(?:TLS|SSL)\b', 'T1592.004', 'Gather Victim Network Information: Client Configurations');
+
+INSERT OR IGNORE INTO technique_signatures (pattern, attack_technique_id, technique_name) VALUES
+('^RFB\s+', 'T1592.004', 'Gather Victim Network Information: Client Configurations');
+
+INSERT OR IGNORE INTO technique_signatures (pattern, attack_technique_id, technique_name) VALUES
+('^(?:DATA|Data)\b', 'T1048', 'Exfiltration Over Alternative Protocol');
+
 
 -- ── T1078 - Valid Accounts ──────────────────────────────────────────────────
 
