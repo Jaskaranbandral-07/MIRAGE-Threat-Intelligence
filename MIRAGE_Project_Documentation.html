@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIRAGE — Complete Project Documentation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        @page { margin: 0; size: A4; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0e1a;
+            color: #cbd5e1;
+            line-height: 1.8;
+            font-size: 14px;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* ── Cover ─────────────────────────────────────── */
+        .cover {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #050810 0%, #0a1628 40%, #0f1d3a 70%, #050810 100%);
+            position: relative;
+            overflow: hidden;
+            page-break-after: always;
+        }
+        .cover::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(ellipse at 30% 50%, rgba(0,240,255,0.08) 0%, transparent 50%),
+                        radial-gradient(ellipse at 70% 50%, rgba(124,58,237,0.06) 0%, transparent 50%);
+        }
+        .cover-content { position: relative; z-index: 1; }
+        .cover-logo {
+            font-size: 72px; font-weight: 800; letter-spacing: 0.25em;
+            background: linear-gradient(135deg, #fff 0%, #00f0ff 50%, #7c3aed 100%);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+            margin-bottom: 16px;
+        }
+        .cover-subtitle {
+            font-size: 18px; font-weight: 300; color: #94a3b8;
+            letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 60px;
+        }
+        .cover-divider {
+            width: 120px; height: 2px;
+            background: linear-gradient(90deg, transparent, #00f0ff, transparent);
+            margin: 0 auto 40px;
+        }
+        .cover-title { font-size: 32px; font-weight: 600; color: #fff; margin-bottom: 12px; }
+        .cover-desc { font-size: 16px; color: #64748b; max-width: 550px; line-height: 1.7; }
+        .cover-meta {
+            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 40px; font-size: 12px; color: #475569;
+            letter-spacing: 0.05em; z-index: 1;
+        }
+        .cover-meta span { display: flex; align-items: center; gap: 8px; }
+        .cover-meta .dot { width: 6px; height: 6px; border-radius: 50%; background: #00f0ff; }
+
+        /* ── Content ───────────────────────────────────── */
+        .content { max-width: 820px; margin: 0 auto; padding: 60px 50px; }
+
+        /* ── Section Headers ───────────────────────────── */
+        .section { margin-bottom: 48px; }
+        .section-number {
+            font-family: 'JetBrains Mono', monospace; font-size: 13px;
+            color: #00f0ff; font-weight: 500; letter-spacing: 0.05em;
+            margin-bottom: 8px; display: block;
+        }
+        h2.section-heading {
+            font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 16px;
+            padding-bottom: 16px; border-bottom: 2px solid rgba(0,240,255,0.15);
+        }
+        h3 {
+            font-size: 18px; font-weight: 600; color: #e2e8f0;
+            margin: 32px 0 12px;
+        }
+        h3::before { content: '▸ '; color: #00f0ff; }
+        h4 {
+            font-size: 15px; font-weight: 600; color: #94a3b8;
+            margin: 24px 0 8px; text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        p { color: #94a3b8; margin-bottom: 16px; }
+        strong { color: #e2e8f0; }
+        ul, ol { padding-left: 24px; margin-bottom: 16px; color: #94a3b8; }
+        li { margin-bottom: 8px; }
+
+        /* ── Code Blocks ───────────────────────────────── */
+        .code-block {
+            background: #0d1117; border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px; padding: 20px 24px; margin: 16px 0 20px;
+            overflow-x: auto; position: relative;
+        }
+        .code-block::before {
+            content: attr(data-label); position: absolute; top: 0; right: 0;
+            background: rgba(0,240,255,0.1); color: #00f0ff;
+            font-size: 10px; font-family: 'JetBrains Mono', monospace;
+            padding: 4px 12px; border-radius: 0 10px 0 8px;
+            letter-spacing: 0.05em; text-transform: uppercase; font-weight: 500;
+        }
+        .code-block code {
+            font-family: 'JetBrains Mono', monospace; font-size: 13px;
+            color: #a5f3fc; line-height: 1.8; white-space: pre; display: block;
+        }
+        code.inline {
+            font-family: 'JetBrains Mono', monospace; font-size: 12px;
+            background: rgba(0,240,255,0.08); color: #a5f3fc;
+            padding: 2px 8px; border-radius: 5px;
+            border: 1px solid rgba(0,240,255,0.12);
+        }
+        .comment { color: #475569; }
+        .highlight { color: #fde047; }
+        .string { color: #86efac; }
+
+        /* ── Tables ────────────────────────────────────── */
+        table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 13px; }
+        thead th {
+            background: rgba(0,240,255,0.06); color: #94a3b8; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.08em; font-size: 11px;
+            padding: 12px 16px; text-align: left;
+            border-bottom: 1px solid rgba(0,240,255,0.15);
+        }
+        tbody td {
+            padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); color: #cbd5e1;
+        }
+
+        /* ── Alert Boxes ───────────────────────────────── */
+        .alert {
+            border-radius: 10px; padding: 16px 20px; margin: 16px 0;
+            display: flex; gap: 12px; align-items: flex-start; font-size: 13px;
+        }
+        .alert-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+        .alert-note { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); color: #93c5fd; }
+        .alert-tip { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); color: #6ee7b7; }
+        .alert-warning { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); color: #fcd34d; }
+        .alert-danger { background: rgba(244,63,94,0.08); border: 1px solid rgba(244,63,94,0.2); color: #fda4af; }
+
+        /* ── Concept Cards ─────────────────────────────── */
+        .concept-card {
+            background: linear-gradient(135deg, rgba(0,240,255,0.04) 0%, rgba(124,58,237,0.03) 100%);
+            border: 1px solid rgba(0,240,255,0.1); border-radius: 12px;
+            padding: 24px 28px; margin: 20px 0;
+        }
+        .concept-card-title {
+            font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .concept-card-title .emoji { font-size: 24px; }
+        .concept-card p { color: #94a3b8; margin-bottom: 8px; font-size: 14px; }
+        .concept-card p:last-child { margin-bottom: 0; }
+
+        /* ── Flow Diagram ──────────────────────────────── */
+        .flow-diagram {
+            background: linear-gradient(135deg, #0d1117 0%, #111827 100%);
+            border: 1px solid rgba(0,240,255,0.1); border-radius: 14px;
+            padding: 32px; margin: 24px 0; text-align: center;
+        }
+        .flow-diagram pre {
+            font-family: 'JetBrains Mono', monospace; font-size: 12px;
+            line-height: 1.6; color: #94a3b8; display: inline-block; text-align: left;
+        }
+        .cyan { color: #00f0ff; } .amber { color: #fbbf24; }
+        .violet { color: #a78bfa; } .emerald { color: #34d399; }
+        .rose { color: #fb7185; } .white { color: #fff; font-weight: 600; }
+
+        /* ── File Tree ─────────────────────────────────── */
+        .file-tree {
+            background: #0d1117; border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px; padding: 24px; margin: 16px 0;
+            font-family: 'JetBrains Mono', monospace; font-size: 13px;
+            line-height: 1.8; color: #64748b;
+        }
+        .file-tree .folder { color: #fbbf24; font-weight: 500; }
+        .file-tree .file { color: #a5f3fc; }
+        .file-tree .desc { color: #475569; font-style: italic; }
+
+        /* ── Analogy Box ───────────────────────────────── */
+        .analogy {
+            background: rgba(124,58,237,0.06); border: 1px solid rgba(124,58,237,0.15);
+            border-radius: 12px; padding: 20px 24px; margin: 16px 0;
+            border-left: 3px solid #7c3aed;
+        }
+        .analogy-label {
+            font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;
+            color: #a78bfa; font-weight: 600; margin-bottom: 6px;
+        }
+        .analogy p { color: #c4b5fd; margin-bottom: 0; }
+
+        /* ── Tech Badge ────────────────────────────────── */
+        .tech-grid { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 24px; }
+        .tech-badge {
+            background: rgba(0,240,255,0.06); border: 1px solid rgba(0,240,255,0.15);
+            border-radius: 8px; padding: 10px 16px; display: flex;
+            flex-direction: column; gap: 2px; min-width: 140px;
+        }
+        .tech-badge-name { font-size: 13px; font-weight: 600; color: #e2e8f0; }
+        .tech-badge-role { font-size: 11px; color: #64748b; }
+
+        .page-break { page-break-before: always; }
+
+        .doc-footer {
+            margin-top: 80px; padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            text-align: center; color: #334155; font-size: 12px; letter-spacing: 0.05em;
+        }
+
+        .print-btn {
+            position: fixed; bottom: 30px; right: 30px;
+            background: linear-gradient(135deg, #00f0ff 0%, #7c3aed 100%);
+            color: #000; border: none; padding: 16px 32px; border-radius: 50px;
+            font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700;
+            cursor: pointer; z-index: 9999;
+            box-shadow: 0 4px 24px rgba(0,240,255,0.3); letter-spacing: 0.05em;
+        }
+        .print-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,240,255,0.5); }
+        @media print { .print-btn { display: none !important; } }
+
+        /* ── TOC ───────────────────────────────────────── */
+        .toc { page-break-after: always; }
+        .toc h2 { font-size: 28px; margin-bottom: 32px; color: #fff; }
+        .toc-list { list-style: none; counter-reset: toc; }
+        .toc-list li {
+            counter-increment: toc; display: flex; align-items: center;
+            padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .toc-list li::before {
+            content: counter(toc, decimal-leading-zero);
+            font-family: 'JetBrains Mono', monospace; font-size: 13px;
+            color: #00f0ff; margin-right: 20px; font-weight: 500; min-width: 30px;
+        }
+        .toc-list li span { flex: 1; color: #cbd5e1; }
+
+        /* ── Print Fixes to Prevent Distortion ─────── */
+        @media print {
+            body { 
+                /* Prevent flexbox from breaking Chrome's print pagination */
+                display: block !important; 
+            }
+            .content {
+                display: block !important;
+            }
+            .code-block, table, tr, td, th, .concept-card, 
+            .analogy, .alert, .file-tree, .tech-badge {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            h2, h3, h4 {
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+            }
+            /* Ensure cover page flexbox doesn't bleed into next pages */
+            .cover {
+                display: block !important;
+                height: 100vh !important;
+                padding-top: 30vh !important;
+            }
+            .cover-meta {
+                position: relative !important;
+                bottom: auto !important;
+                left: auto !important;
+                transform: none !important;
+                justify-content: center !important;
+                margin-top: 100px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">⬇ Save as PDF</button>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--                     COVER PAGE                        -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="cover">
+    <div class="cover-content">
+        <div class="cover-logo">MIRAGE</div>
+        <div class="cover-subtitle">Deception Intelligence Platform</div>
+        <div class="cover-divider"></div>
+        <div class="cover-title">Complete Project Documentation</div>
+        <div class="cover-desc">A beginner-friendly guide that explains every single component of the MIRAGE project — what it does, how it works, and why it matters.</div>
+    </div>
+    <div class="cover-meta">
+        <span><div class="dot"></div>Version 1.0</span>
+        <span><div class="dot"></div>July 2026</span>
+        <span><div class="dot"></div>Jaskaran Bandral</span>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="content">
+
+    <!-- TOC -->
+    <div class="toc">
+        <h2>Table of Contents</h2>
+        <ol class="toc-list">
+            <li><span>What is MIRAGE? (The Big Picture)</span></li>
+            <li><span>Core Concepts You Need to Know</span></li>
+            <li><span>How the Whole System Works Together</span></li>
+            <li><span>Project File Structure</span></li>
+            <li><span>Layer 1: Cowrie SSH Honeypot</span></li>
+            <li><span>Layer 2: Flask HTTP Decoy</span></li>
+            <li><span>Layer 3: Ingestion Engine</span></li>
+            <li><span>Layer 4: The Database</span></li>
+            <li><span>Layer 5: Analytics Engine</span></li>
+            <li><span>Layer 6: The Dashboard</span></li>
+            <li><span>Technologies Used & Why</span></li>
+            <li><span>What is MITRE ATT&CK?</span></li>
+            <li><span>What is DBSCAN Clustering?</span></li>
+            <li><span>Security & Safety Considerations</span></li>
+            <li><span>How to Present This Project</span></li>
+        </ol>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!--              SECTION 1                         -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section">
+        <span class="section-number">01</span>
+        <h2 class="section-heading">What is MIRAGE? (The Big Picture)</h2>
+
+        <p><strong>MIRAGE</strong> stands for <strong>Modular Intelligence for Reconnaissance Analysis and Gathering Engine</strong>. It is a <strong>honeypot system</strong> — a cybersecurity tool designed to <strong>attract, trap, and study real hackers and automated bots</strong> on the internet.</p>
+
+        <div class="analogy">
+            <div class="analogy-label">🧠 Think of it like this</div>
+            <p>Imagine you are a police detective and you want to catch thieves. Instead of waiting for them to rob a real bank, you set up a <strong>fake bank</strong> that looks completely real. Thieves walk in thinking they're robbing a real bank, but every step they take is being recorded by hidden cameras. Afterwards, you study the footage to learn their techniques and catch them. <strong>MIRAGE is that fake bank, but for the internet.</strong></p>
+        </div>
+
+        <h3>What does MIRAGE actually do?</h3>
+        <ol>
+            <li><strong>Sets a trap</strong> — It runs a fake SSH server (like a fake computer login) and a fake website, both exposed to the internet.</li>
+            <li><strong>Attracts attackers</strong> — Hackers and bots that scan the internet discover your server and try to break in.</li>
+            <li><strong>Records everything</strong> — Every login attempt, every command they type, every page they visit is silently captured and stored in a database.</li>
+            <li><strong>Analyzes the attacks</strong> — A math-based engine groups similar attackers together (clustering) and labels their actions using a global cybersecurity framework (MITRE ATT&CK).</li>
+            <li><strong>Displays the results</strong> — A premium web dashboard shows you charts, heatmaps, and live feeds of everything happening.</li>
+        </ol>
+
+        <div class="alert alert-tip">
+            <span class="alert-icon">💡</span>
+            <span><strong>Why does this matter?</strong> Honeypots are used by real cybersecurity companies, governments, and researchers worldwide. By building and running one, you are demonstrating real-world security engineering skills.</span>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!--              SECTION 2                         -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section">
+        <span class="section-number">02</span>
+        <h2 class="section-heading">Core Concepts You Need to Know</h2>
+
+        <div class="concept-card">
+            <div class="concept-card-title"><span class="emoji">🍯</span> Honeypot</div>
+            <p>A <strong>honeypot</strong> is a deliberately vulnerable computer system set up to attract attackers. It looks like a real target (a server, a website, etc.), but it's actually a trap. Everything the attacker does is monitored and logged. Honeypots are used to study attack techniques, collect malware samples, and improve defenses.</p>
+        </div>
+
+        <div class="concept-card">
+            <div class="concept-card-title"><span class="emoji">🔐</span> SSH (Secure Shell)</div>
+            <p>SSH is the most common way to remotely log into and control a Linux server over the internet. You type commands in a terminal (like <code class="inline">ls</code>, <code class="inline">cat /etc/passwd</code>), and the server executes them. <strong>Attackers use SSH to break into servers</strong> by guessing usernames and passwords (brute-force attacks). Our Cowrie honeypot pretends to be an SSH server so attackers think they've "broken in."</p>
+        </div>
+
+        <div class="concept-card">
+            <div class="concept-card-title"><span class="emoji">🌐</span> HTTP / Web Application</div>
+            <p>HTTP is the protocol your web browser uses. When you visit a website, your browser sends HTTP requests (like <code class="inline">GET /index.html</code>) and the server sends back the page. <strong>Web scanners</strong> are bots that automatically visit thousands of websites looking for known vulnerabilities like exposed config files (<code class="inline">/.env</code>) or admin panels (<code class="inline">/admin</code>). Our Flask decoy is a fake website designed to attract these scanners.</p>
+        </div>
+
+        <div class="concept-card">
+            <div class="concept-card-title"><span class="emoji">🐳</span> Docker & Containers</div>
+            <p>Docker is a tool that packages an application and all its dependencies into an isolated "container." Think of it like a lightweight virtual machine. Each MIRAGE service (Cowrie, Decoy, Dashboard, Ingestion) runs in its own container, isolated from each other. <strong>Docker Compose</strong> is a tool that starts all containers together with a single command: <code class="inline">docker compose up -d</code>.</p>
+        </div>
+
+        <div class="concept-card">
+            <div class="concept-card-title"><span class="emoji">🤖</span> Bot vs. Human Attacker</div>
+            <p>A <strong>bot</strong> is an automated program that scans the internet and attacks servers without human involvement. Bots type commands very quickly (100-500ms between each command) and follow the exact same pattern every time. A <strong>human attacker</strong> is a real person typing commands manually — their timing is irregular (1-15 seconds between commands) and they explore more creatively. MIRAGE's analytics engine can tell the difference.</p>
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!--              SECTION 3                         -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section">
+        <span class="section-number">03</span>
+        <h2 class="section-heading">How the Whole System Works Together</h2>
+
+        <p>Here is the complete data flow — from an attacker connecting to your server, all the way to the data appearing on your dashboard:</p>
+
+        <div class="flow-diagram">
+            <pre>
+  <span class="white">STEP 1: ATTACKER FINDS YOUR SERVER</span>
+  Bots scan the entire internet 24/7.
+  They find your server's IP address and try to connect.
+
+       │
+       ▼
+
+  <span class="white">STEP 2: ATTACKER CONNECTS</span>
+  ┌────────────────────────┐    ┌────────────────────────┐
+  │  <span class="cyan">SSH on Port 2222</span>       │    │  <span class="amber">HTTP on Port 8080</span>     │
+  │  Attacker types:       │    │  Scanner requests:     │
+  │  $ ssh root@your-ip    │    │  GET /.env             │
+  │  Password: admin       │    │  GET /admin            │
+  │  $ cat /etc/passwd     │    │  POST /login           │
+  └──────────┬─────────────┘    └──────────┬─────────────┘
+             │                              │
+             ▼                              ▼
+  <span class="white">STEP 3: DATA IS CAPTURED</span>
+  ┌────────────────────────┐    ┌────────────────────────┐
+  │  <span class="cyan">COWRIE</span> writes a JSON    │    │  <span class="amber">FLASK DECOY</span> middleware │
+  │  log file with every   │    │  writes directly to    │
+  │  command + timing      │    │  the SQLite database   │
+  └──────────┬─────────────┘    └──────────┬─────────────┘
+             │                              │
+             ▼                              │
+  <span class="white">STEP 4: INGESTION ENGINE</span>                 │
+  ┌────────────────────────┐               │
+  │  <span class="emerald">COWRIE WATCHER</span>         │               │
+  │  Reads Cowrie's JSON   │               │
+  │  log, normalizes it,   │               │
+  │  and writes to DB      ├───────────────┤
+  └────────────────────────┘               │
+                                           ▼
+  <span class="white">STEP 5: DATA STORED IN DATABASE</span>
+  ┌────────────────────────────────────────────────────┐
+  │  <span class="violet">SQLite Database (mirage.db)</span>                        │
+  │  Tables: sources, sessions, commands,              │
+  │          clusters, technique_signatures,            │
+  │          session_techniques                         │
+  └────────────────────────┬───────────────────────────┘
+                           │
+                           ▼
+  <span class="white">STEP 6: ANALYTICS ENGINE (Run manually)</span>
+  ┌────────────────────────────────────────────────────┐
+  │  <span class="rose">DBSCAN Clustering</span> → Groups similar attackers      │
+  │  <span class="rose">ATT&CK Tagger</span>    → Labels attack techniques       │
+  │  <span class="rose">Bot Detector</span>     → Classifies bot vs human        │
+  └────────────────────────┬───────────────────────────┘
+                           │
+                           ▼
+  <span class="white">STEP 7: DASHBOARD DISPLAYS RESULTS</span>
+  ┌────────────────────────────────────────────────────┐
+  │  <span class="cyan">Flask Dashboard on Port 5000</span>                      │
+  │  Charts, Heatmaps, Tables, Live Feed               │
+  │  Open: http://your-server-ip:5000                  │
+  └────────────────────────────────────────────────────┘
+            </pre>
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!--              SECTION 4                         -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section">
+        <span class="section-number">04</span>
+        <h2 class="section-heading">Project File Structure</h2>
+
+        <p>Here is every file in the project and what it does:</p>
+
+        <div class="file-tree">
+<span class="folder">MIRAGE Project/</span>
+├── <span class="file">config.py</span>              <span class="desc">── All settings (ports, paths, thresholds)</span>
+├── <span class="file">requirements.txt</span>       <span class="desc">── Python packages needed</span>
+├── <span class="file">docker-compose.yml</span>     <span class="desc">── Tells Docker how to run all 4 services</span>
+├── <span class="file">seed_demo_data.py</span>      <span class="desc">── Generates fake attacker data for demo</span>
+├── <span class="file">clear_demo_data.py</span>     <span class="desc">── Wipes all data for a fresh start</span>
+├── <span class="file">.env.example</span>           <span class="desc">── Template for environment variables</span>
+├── <span class="file">README.md</span>              <span class="desc">── Project overview documentation</span>
+│
+├── <span class="folder">database/</span>              <span class="desc">── Everything related to data storage</span>
+│   ├── <span class="file">schema.sql</span>         <span class="desc">── Creates all database tables</span>
+│   ├── <span class="file">seed_signatures.sql</span> <span class="desc">── 30 ATT&CK attack patterns</span>
+│   └── <span class="file">db.py</span>              <span class="desc">── Python code to connect to the database</span>
+│
+├── <span class="folder">decoy/</span>                 <span class="desc">── The fake vulnerable website</span>
+│   ├── <span class="file">app.py</span>             <span class="desc">── Flask web server with intentional bugs</span>
+│   ├── <span class="file">middleware.py</span>      <span class="desc">── Logs every HTTP request to the database</span>
+│   ├── <span class="file">Dockerfile</span>         <span class="desc">── Docker build instructions</span>
+│   └── <span class="folder">templates/</span>         <span class="desc">── HTML pages for the fake website</span>
+│       ├── <span class="file">index.html</span>     <span class="desc">── Landing page</span>
+│       ├── <span class="file">login.html</span>     <span class="desc">── Vulnerable login form</span>
+│       └── <span class="file">admin.html</span>     <span class="desc">── Fake admin panel</span>
+│
+├── <span class="folder">ingestion/</span>             <span class="desc">── Reads Cowrie logs into the database</span>
+│   ├── <span class="file">cowrie_watcher.py</span>  <span class="desc">── Watches and parses Cowrie's JSON log</span>
+│   └── <span class="file">Dockerfile</span>         <span class="desc">── Docker build instructions</span>
+│
+├── <span class="folder">analytics/</span>             <span class="desc">── Math-based analysis of captured data</span>
+│   ├── <span class="file">clustering.py</span>     <span class="desc">── DBSCAN algorithm to group attackers</span>
+│   ├── <span class="file">attack_tagger.py</span>  <span class="desc">── Matches commands to ATT&CK techniques</span>
+│   ├── <span class="file">bot_detector.py</span>   <span class="desc">── Classifies bot vs human sessions</span>
+│   └── <span class="file">run_analytics.py</span>  <span class="desc">── Runs all analytics in order</span>
+│
+└── <span class="folder">dashboard/</span>             <span class="desc">── The web UI you see in the browser</span>
+    ├── <span class="file">app.py</span>             <span class="desc">── Flask API serving data to the frontend</span>
+    ├── <span class="file">Dockerfile</span>         <span class="desc">── Docker build instructions</span>
+    ├── <span class="folder">templates/</span>
+    │   └── <span class="file">index.html</span>     <span class="desc">── The single-page dashboard HTML</span>
+    └── <span class="folder">static/</span>
+        ├── <span class="folder">css/</span>
+        │   └── <span class="file">mirage.css</span> <span class="desc">── All styling (dark theme, glassmorphism)</span>
+        └── <span class="folder">js/</span>
+            ├── <span class="file">mirage.js</span>  <span class="desc">── Charts, live feed, data loading</span>
+            └── <span class="file">heatmap.js</span> <span class="desc">── ATT&CK technique heatmap renderer</span>
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!--              SECTION 5                         -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section">
+        <span class="section-number">05</span>
+        <h2 class="section-heading">Layer 1: Cowrie SSH Honeypot</h2>
+
+        <p><strong>Cowrie</strong> is an open-source SSH honeypot. It pretends to be a real Linux server. When an attacker connects via SSH and types commands, Cowrie:</p>
+
+        <ul>
+            <li>Accepts common passwords like <code class="inline">root/admin</code>, <code class="inline">root/123456</code></li>
+            <li>Presents a <strong>fake Linux shell</strong> that looks real but isn't</li>
+            <li>Lets attackers "run" commands like <code class="inline">ls</code>, <code class="inline">cat /etc/passwd</code>, <code class="inline">wget</code></li>
+            <li>Records <strong>every single thing</strong> they type into a JSON log file</li>
+            <li>Can even capture malware files that attackers try to download</li>
+        </ul>
+
+        <div class="analogy">
+            <div class="analogy-label">🧠 Real-world analogy</div>
+            <p>Cowrie is like a <strong>fake ATM machine</strong> set up by police. It looks real, it "accepts" cards, but instead of dispensing money, it silently photographs the thief and records everything they do.</p>
+        </div>
+
+        <h3>What does Cowrie's JSON log look like?</h3>
+        <div class="code-block" data-label="cowrie.json">
+            <code><span class="comment">// A real attacker trying to log in:</span>
+{"eventid": "<span class="highlight">cowrie.login.success</span>",
+ "username": "<span class="string">root</span>",
+ "password": "<span class="string">admin</span>",
+ "src_ip": "<span class="rose">185.220.101.45</span>",
+ "timestamp": "2026-07-09T15:30:00"}
+
+<span class="comment">// The attacker typing a command:</span>
+{"eventid": "<span class="highlight">cowrie.command.input</span>",
+ "input": "<span class="string">cat /etc/passwd</span>",
+ "src_ip": "<span class="rose">185.220.101.45</span>",
+ "session": "abc123",
+ "timestamp": "2026-07-09T15:30:05"}</code>
+        </div>
+
+        <p><strong>Port:</strong> Cowrie listens on port <code class="inline">2222</code>. When an attacker types <code class="inline">ssh root@your-server -p 2222</code>, they connect to Cowrie instead of a real server.</p>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!--              SECTION 6                         -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section">
+        <span class="section-number">06</span>
+        <h2 class="section-heading">Layer 2: Flask HTTP Decoy</h2>
+
+        <p>The <strong>Flask Decoy</strong> is a deliberately vulnerable web application that we built ourselves. It mimics a real company's internal web app, complete with intentional security bugs that attract hackers and scanners.</p>
+
+        <h3>The 3 Intentional Vulnerabilities</h3>
+
+        <table>
+            <thead>
+                <tr><th>Bug</th><th>What It Does</th><th>Why Attackers Care</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>JWT Secret Leak</strong></td>
+                    <td>The <code class="inline">/debug/config</code> endpoint exposes the secret key used to sign authentication tokens</td>
+                    <td>If an attacker finds this, they can forge admin tokens and impersonate any user</td>
+                </tr>
+                <tr>
+                    <td><strong>Auth Bypass</strong></td>
+                    <td>The login page accepts <code class="inline">admin/admin</code> and can be bypassed by adding <code class="inline">role=admin</code> to the request</td>
+                    <td>Lets attackers gain admin access without knowing the real password</td>
+                </tr>
+                <tr>
+                    <td><strong>Permissive CORS</strong></td>
+                    <td>Every response includes <code class="inline">Access-Control-Allow-Origin: *</code></td>
+                    <td>Allows any website in the world to make requests to this server (a real security flaw)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Bait Endpoints (Attracting Scanners)</h3>
+        <table>
+            <thead><tr><th>URL Path</th><th>What It Returns</th><th>Why Scanners Look for It</th></tr></thead>
+            <tbody>
+                <tr><td><code class="inline">/.env</code></td><td>Fake credentials file</td><td>Many web apps accidentally expose their <code class="inline">.env</code> file with database passwords</td></tr>
+                <tr><td><code class="inline">/.git/config</code></td><td>Fake git config</td><td>Exposed git repos let attackers download source code</td></tr>
+                <tr><td><code class="inline">/api/users</code></td><td>Fake user list with emails</td><td>Attackers harvest email addresses for phishing</td></tr>
+                <tr><td><code class="inline">/debug/config</code></td><td>Fake config with JWT secret</td><td>Debug endpoints often leak sensitive information</td></tr>
+                <tr><td><code class="inline">/robots.txt</code></td><td>Lists "hidden" paths</td><td>Scanners read this to find interesting URLs to attack</td></tr>
+            </tbody>
+        </table>
+
+        <h3>How does it log everything?</h3>
+        <p>The <code class="inline">middleware.py</code> file hooks into Flask's request pipeline. <strong>Before every single HTTP request is processed</strong>, the middleware silently captures the source IP, the request method and path (e.g., <code class="inline">GET /.env</code>), and the timestamp — then writes it all into the database as a "command" within an attacker's session.</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!--              SECTION 7                         -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section">
+        <span class="section-number">07</span>
+        <h2 class="section-heading">Layer 3: Ingestion Engine</h2>
+
+        <p>The <strong>Ingestion Engine</strong> (<code class="inline">cowrie_watcher.py</code>) is a long-running background process that acts as a bridge between Cowrie's JSON log file and the MIRAGE database.</p>
+
+        <h3>What does it do?</h3>
+        <ol>
+            <li><strong>Watches</strong> the Cowrie log file (<code class="inline">cowrie.json</code>) for new lines being added</li>
+            <li><strong>Parses</strong> each JSON event (login attempt, command typed, session started/ended)</li>
+            <li><strong>Normalizes</strong> the data into clean rows that match our database schema</li>
+            <li><strong>Writes</strong> the normalized data into the SQLite database</li>
+        </ol>
+
+        <div class="analogy">
+            <div class="analogy-label">🧠 Real-world analogy</div>
+            <p>Think of the Ingestion Engine as a <strong>court stenographer</strong>. The Cowrie honeypot is the courtroom where things happen, and the stenographer sits in the corner silently transcribing every word that is spoken into an organized, searchable document (the database).</p>
+        </div>
+
+        <h3>Event types it handles</h3>
+        <table>
+            <thead><tr><th>Cowrie Event</th><th>What It Means</th><th>Database Action</th></tr></thead>
+            <tbody>
+                <tr><td><code class="inline">cowrie.session.connect</code></td><td>Attacker connected to the honeypot</td><td>Creates a new <code class="inline">session</code> row + upserts <code class="inline">sources</code></td></tr>
+                <tr><td><code class="inline">cowrie.login.success</code></td><td>Attacker guessed the right password</td><td>Updates the session</td></tr>
+                <tr><td><code class="inline">cowrie.login.failed</code></td><td>Attacker guessed wrong</td><td>Logs the attempt</td></tr>
+                <tr><td><code class="inline">cowrie.command.input</code></td><td>Attacker typed a command</td><td>Inserts into <code class="inline">commands</code> table</td></tr>
+                <tr><td><code class="inline">cowrie.session.closed</code></td><td>Attacker disconnected</td><td>Updates session end_time & duration</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!--              SECTION 8                         -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section">
+        <span class="section-number">08</span>
+        <h2 class="section-heading">Layer 4: The Database</h2>
+
+        <p>MIRAGE uses <strong>SQLite</strong> — a lightweight database that stores all its data in a single file called <code class="inline">mirage.db</code>. No external database server needed.</p>
+
+        <h3>The 6 tables explained</h3>
+
+        <table>
+            <thead><tr><th>Table</th><th>What It Stores</th><th>Example Data</th></tr></thead>
+            <tbody>
+                <tr><td><strong>sources</strong></td><td>Every unique IP address that connected</td><td>IP: 185.220.101.45, Country: Russia, First seen: July 9</td></tr>
+                <tr><td><strong>sessions</strong></td><td>Each individual attack session</td><td>Session #42: SSH from 185.220.101.45, lasted 45 seconds</td></tr>
+                <tr><td><strong>commands</strong></td><td>Every command typed by every attacker</td><td>"cat /etc/passwd" — typed 5.2 seconds after previous command</td></tr>
+                <tr><td><strong>clusters</strong></td><td>Groups of similar attack sessions</td><td>Cluster "Botnet-Alpha": 20 sessions with same commands</td></tr>
+                <tr><td><strong>technique_signatures</strong></td><td>30 regex patterns for known attack techniques</td><td>Pattern: "cat /etc/passwd" → ATT&CK T1003.008</td></tr>
+                <tr><td><strong>session_techniques</strong></td><td>Links sessions to the techniques they used</td><td>Session #42 used techniques T1003.008 and T1082</td></tr>
+            </tbody>
+        </table>
+
+        <div class="alert alert-note">
+            <span class="alert-icon">ℹ️</span>
+            <span><strong>Why SQLite?</strong> The PRD specifically requires SQLite because it's a single file (easy to deploy), needs no server process, and is perfect for a self-contained honeypot system. For a production system handling thousands of concurrent attacks, you'd typically upgrade to PostgreSQL.</span>
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!--              SECTION 9                         -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section">
+        <span class="section-number">09</span>
+        <h2 class="section-heading">Layer 5: Analytics Engine</h2>
+
+        <p>The Analytics Engine is the "brain" of MIRAGE. It takes raw captured data and turns it into <strong>actionable intelligence</strong>. It has three components:</p>
+
+        <div class="alert alert-warning">
+            <span class="alert-icon">⚡</span>
+            <span><strong>Zero AI / Zero LLMs:</strong> The entire analytics engine uses only math and regex patterns. There are absolutely no AI models, no ChatGPT calls, no machine learning models that need training. This is a deliberate design choice — the system must work reliably without internet access or API keys.</span>
+        </div>
+
+        <h3>Component 1: DBSCAN Clustering</h3>
+        <p><strong>File:</strong> <code class="inline">analytics/clustering.py</code></p>
+        <p><strong>Purpose:</strong> Groups similar attacker sessions into "campaigns."</p>
+        <p><strong>How it works:</strong></p>
+        <ol>
+            <li>For each session, it extracts <strong>19 numerical features</strong> like: total commands, unique commands, session duration, average typing speed, percentage of recon commands, etc.</li>
+            <li>It feeds these feature vectors into the <strong>DBSCAN algorithm</strong> (explained in Section 13).</li>
+            <li>DBSCAN groups sessions that have similar feature profiles. For example, 20 sessions that all type the same 5 commands with 200ms delays → grouped as a single botnet campaign.</li>
+            <li>Sessions that don't fit any group are marked as "noise" (outliers) — these are often the most interesting because they might be manual human hackers.</li>
+        </ol>
+
+        <h3>Component 2: ATT&CK Tagger</h3>
+        <p><strong>File:</strong> <code class="inline">analytics/attack_tagger.py</code></p>
+        <p><strong>Purpose:</strong> Labels each command with a standardized attack technique from the MITRE ATT&CK framework (explained in Section 12).</p>
+        <p><strong>How it works:</strong></p>
+        <ol>
+            <li>Loads 30 regex (regular expression) patterns from the database.</li>
+            <li>For every command in every session, it checks if the command matches any pattern.</li>
+            <li>If <code class="inline">cat /etc/passwd</code> matches the pattern for "T1003.008 — OS Credential Dumping," it creates a link in the <code class="inline">session_techniques</code> table.</li>
+        </ol>
+
+        <h3>Component 3: Bot Detector</h3>
+        <p><strong>File:</strong> <code class="inline">analytics/bot_detector.py</code></p>
+        <p><strong>Purpose:</strong> Classifies each session as "bot" or "human" based on typing patterns.</p>
+        <p><strong>How it works:</strong></p>
+        <ul>
+            <li><strong>Bots</strong> type at very consistent speeds (low variance in time between commands)</li>
+            <li><strong>Humans</strong> type at irregular speeds (high variance — sometimes fast, sometimes slow while they think)</li>
+            <li>The detector calculates the <strong>coefficient of variation</strong> (standard deviation ÷ mean) of the inter-command timing. High variation = human. Low variation = bot.</li>
+        </ul>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!--              SECTION 10                        -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section">
+        <span class="section-number">10</span>
+        <h2 class="section-heading">Layer 6: The Dashboard</h2>
+
+        <p>The Dashboard is the visual command center — a single-page web application that reads data from the database via API endpoints and displays it using charts, tables, and live feeds.</p>
+
+        <h3>How the Dashboard architecture works</h3>
+        <p>The dashboard consists of three parts working together:</p>
+
+        <table>
+            <thead><tr><th>Part</th><th>File</th><th>Role</th></tr></thead>
+            <tbody>
+                <tr><td><strong>Backend API</strong></td><td><code class="inline">dashboard/app.py</code></td><td>Flask server that queries the database and returns JSON data via API endpoints like <code class="inline">/api/stats</code>, <code class="inline">/api/timeline</code>, <code class="inline">/api/sessions</code></td></tr>
+                <tr><td><strong>Frontend HTML</strong></td><td><code class="inline">templates/index.html</code></td><td>The page structure — all the cards, charts, tables, and the layout grid</td></tr>
+                <tr><td><strong>Frontend JS</strong></td><td><code class="inline">static/js/mirage.js</code></td><td>JavaScript that calls the API, processes the data, and renders it into Chart.js charts and HTML tables</td></tr>
+                <tr><td><strong>Styling</strong></td><td><code class="inline">static/css/mirage.css</code></td><td>The dark cybersecurity theme with glassmorphism, glowing accents, and animations</td></tr>
+                <tr><td><strong>Heatmap</strong></td><td><code class="inline">static/js/heatmap.js</code></td><td>Custom renderer for the MITRE ATT&CK technique heatmap grid</td></tr>
+            </tbody>
+        </table>
+
+        <h3>API Endpoints (What the backend serves)</h3>
+        <table>
+            <thead><tr><th>Endpoint</th><th>Returns</th></tr></thead>
+            <tbody>
+                <tr><td><code class="inline">GET /api/stats</code></td><td>Total sessions, unique IPs, techniques matched, average duration</td></tr>
+                <tr><td><code class="inline">GET /api/timeline</code></td><td>Daily SSH/HTTP session counts for the line chart</td></tr>
+                <tr><td><code class="inline">GET /api/sessions</code></td><td>Paginated list of all sessions with filtering</td></tr>
+                <tr><td><code class="inline">GET /api/sessions/&lt;id&gt;</code></td><td>Detailed view of a single session + all its commands</td></tr>
+                <tr><td><code class="inline">GET /api/clusters</code></td><td>All discovered campaign clusters</td></tr>
+                <tr><td><code class="inline">GET /api/techniques/top</code></td><td>Top 10 most frequently detected techniques</td></tr>
+                <tr><td><code class="inline">GET /api/techniques/heatmap</code></td><td>Technique frequency data for the heatmap</td></tr>
+                <tr><td><code class="inline">GET /api/geo</code></td><td>Attacker countries for the sources chart</td></tr>
+                <tr><td><code class="inline">GET /api/commands/recent</code></td><td>Latest commands for the live feed</td></tr>
+                <tr><td><code class="inline">GET /api/live</code></td><td>Server-Sent Events stream for real-time updates</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!--              SECTION 11                        -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section">
+        <span class="section-number">11</span>
+        <h2 class="section-heading">Technologies Used & Why</h2>
+
+        <div class="tech-grid">
+            <div class="tech-badge"><span class="tech-badge-name">Python 3.11</span><span class="tech-badge-role">Core language for all backend code</span></div>
+            <div class="tech-badge"><span class="tech-badge-name">Flask</span><span class="tech-badge-role">Lightweight web framework (Decoy + Dashboard)</span></div>
+            <div class="tech-badge"><span class="tech-badge-name">SQLite</span><span class="tech-badge-role">Embedded database (no server needed)</span></div>
+            <div class="tech-badge"><span class="tech-badge-name">Cowrie</span><span class="tech-badge-role">Open-source SSH/Telnet honeypot</span></div>
+            <div class="tech-badge"><span class="tech-badge-name">Docker</span><span class="tech-badge-role">Containerization for isolated deployment</span></div>
+            <div class="tech-badge"><span class="tech-badge-name">Docker Compose</span><span class="tech-badge-role">Multi-container orchestration</span></div>
+            <div class="tech-badge"><span class="tech-badge-name">scikit-learn</span><span class="tech-badge-role">DBSCAN clustering algorithm</span></div>
+            <div class="tech-badge"><span class="tech-badge-name">SciPy</span><span class="tech-badge-role">Spearman correlation for features</span></div>
+            <div class="tech-badge"><span class="tech-badge-name">pandas</span><span class="tech-badge-role">Data manipulation and feature extraction</span></div>
+            <div class="tech-badge"><span class="tech-badge-name">Watchdog</span><span class="tech-badge-role">File system event monitoring (log tailing)</span></div>
+            <div class="tech-badge"><span class="tech-badge-name">Chart.js</span><span class="tech-badge-role">Interactive charts in the dashboard</span></div>
+            <div class="tech-badge"><span class="tech-badge-name">PyJWT</span><span class="tech-badge-role">JWT token generation for the decoy</span></div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!--              SECTION 12                        -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section">
+        <span class="section-number">12</span>
+        <h2 class="section-heading">What is MITRE ATT&CK?</h2>
+
+        <p><strong>MITRE ATT&CK</strong> (Adversarial Tactics, Techniques, and Common Knowledge) is a globally recognized <strong>knowledge base of cyberattack techniques</strong>. It was created by the MITRE Corporation and is used by every major cybersecurity company in the world.</p>
+
+        <div class="analogy">
+            <div class="analogy-label">🧠 Real-world analogy</div>
+            <p>Think of MITRE ATT&CK like the <strong>Periodic Table of Elements</strong>, but for hacking. Just like every chemical element has a unique symbol (H, He, Li...), every known attack technique has a unique ID (T1003, T1082, T1059...). When a security analyst sees "T1003.008," they instantly know it means "the attacker tried to dump credentials from /etc/passwd."</p>
+        </div>
+
+        <h3>Techniques MIRAGE detects (examples from the 30 loaded)</h3>
+        <table>
+            <thead><tr><th>ID</th><th>Name</th><th>What the Attacker Does</th></tr></thead>
+            <tbody>
+                <tr><td><code class="inline">T1003.008</code></td><td>OS Credential Dumping</td><td>Reads <code class="inline">/etc/passwd</code> or <code class="inline">/etc/shadow</code> to steal passwords</td></tr>
+                <tr><td><code class="inline">T1082</code></td><td>System Info Discovery</td><td>Runs <code class="inline">uname -a</code> to learn about the system</td></tr>
+                <tr><td><code class="inline">T1105</code></td><td>Ingress Tool Transfer</td><td>Uses <code class="inline">wget</code> or <code class="inline">curl</code> to download malware</td></tr>
+                <tr><td><code class="inline">T1496</code></td><td>Resource Hijacking</td><td>Installs crypto miners like <code class="inline">xmrig</code></td></tr>
+                <tr><td><code class="inline">T1070.003</code></td><td>Clear Command History</td><td>Runs <code class="inline">history -c</code> to cover their tracks</td></tr>
+                <tr><td><code class="inline">T1059.004</code></td><td>Unix Shell</td><td>Spawns a shell with <code class="inline">bash -i</code> or <code class="inline">python -c</code></td></tr>
+            </tbody>
+        </table>
+
+        <p><strong>How does MIRAGE detect these?</strong> Each technique has a <strong>regex pattern</strong> stored in the <code class="inline">technique_signatures</code> database table. When a command like <code class="inline">cat /etc/passwd</code> matches the regex <code class="inline">(?:cat|head|tail).*\/etc\/(?:passwd|shadow)</code>, the system tags that session with technique T1003.008.</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!--              SECTION 13                        -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section">
+        <span class="section-number">13</span>
+        <h2 class="section-heading">What is DBSCAN Clustering?</h2>
+
+        <p><strong>DBSCAN</strong> (Density-Based Spatial Clustering of Applications with Noise) is a mathematical algorithm that automatically finds groups of similar items in data — <strong>without you having to tell it how many groups to look for</strong>.</p>
+
+        <div class="analogy">
+            <div class="analogy-label">🧠 Real-world analogy</div>
+            <p>Imagine you throw 100 marbles on a table. Some marbles land close together in small piles, and a few land far away from everything else. <strong>DBSCAN is like an algorithm that identifies each pile as a "cluster" and labels the loners as "noise."</strong> You don't have to tell it how many piles there are — it figures it out by itself based on how close the marbles are to each other.</p>
+        </div>
+
+        <h3>How MIRAGE uses DBSCAN</h3>
+        <ol>
+            <li><strong>Feature Extraction:</strong> For each session, we calculate 19 numbers that describe the session's behavior (how many commands, how fast they typed, what percentage were recon commands, etc.)</li>
+            <li><strong>Normalization:</strong> We scale all numbers to the same range so no single feature dominates</li>
+            <li><strong>DBSCAN:</strong> The algorithm looks at these 19-dimensional "points" and finds clusters of sessions that behave similarly</li>
+            <li><strong>Result:</strong> Each cluster becomes a "campaign" — e.g., "20 sessions from different IPs that all ran the same 5 commands with identical timing are probably the same botnet"</li>
+        </ol>
+
+        <h3>Why DBSCAN and not K-Means?</h3>
+        <table>
+            <thead><tr><th>Feature</th><th>DBSCAN ✅</th><th>K-Means ❌</th></tr></thead>
+            <tbody>
+                <tr><td>Requires you to specify number of clusters</td><td>No (figures it out)</td><td>Yes (you must guess)</td></tr>
+                <tr><td>Handles outliers</td><td>Yes (labels them as noise)</td><td>No (forces them into a cluster)</td></tr>
+                <tr><td>Finds non-spherical clusters</td><td>Yes</td><td>No</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!--              SECTION 14                        -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section">
+        <span class="section-number">14</span>
+        <h2 class="section-heading">Security & Safety Considerations</h2>
+
+        <div class="alert alert-danger">
+            <span class="alert-icon">🔴</span>
+            <span><strong>CRITICAL:</strong> MIRAGE is intentionally vulnerable. The Flask decoy has real security bugs. The SSH honeypot accepts attacker connections. This system MUST run on an <strong>isolated cloud server</strong> (like AWS EC2), never on your personal computer or home network.</span>
+        </div>
+
+        <h3>Why isolation matters</h3>
+        <ul>
+            <li>The system is <strong>designed to attract real hackers</strong>. If an attacker somehow escapes the Docker container, they must NOT have access to your personal files, home network, or other devices.</li>
+            <li>A cloud VM is <strong>physically separated</strong> from your home. If it gets compromised, you just delete the VM from the AWS console — zero risk to you.</li>
+            <li>Never store real credentials, personal data, or sensitive information on the same server as the honeypot.</li>
+        </ul>
+
+        <h3>What attackers CAN and CANNOT do</h3>
+        <table>
+            <thead><tr><th>Can ✅</th><th>Cannot ❌</th></tr></thead>
+            <tbody>
+                <tr><td>Connect to the fake SSH shell</td><td>Access the real operating system</td></tr>
+                <tr><td>Type commands in Cowrie's sandbox</td><td>Execute real commands on the server</td></tr>
+                <tr><td>Visit the decoy website</td><td>Access the dashboard (different port)</td></tr>
+                <tr><td>Download files into Cowrie's fake filesystem</td><td>Actually install software on the server</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!--              SECTION 15                        -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section">
+        <span class="section-number">15</span>
+        <h2 class="section-heading">How to Present This Project</h2>
+
+        <p>When presenting MIRAGE for your internship or portfolio, here are the key points to emphasize:</p>
+
+        <h3>Opening Statement</h3>
+        <p><em>"MIRAGE is a deception intelligence platform that I built to study real-world cyberattacks. It deploys a multi-protocol honeypot on an isolated cloud server, captures live attacker sessions, and uses mathematical clustering to automatically group attackers into campaigns and map their behavior to the MITRE ATT&CK framework — all without using any AI or machine learning models."</em></p>
+
+        <h3>Key Technical Highlights to Mention</h3>
+        <ul>
+            <li><strong>Multi-protocol capture:</strong> Both SSH (Cowrie) and HTTP (Flask decoy) attack surfaces</li>
+            <li><strong>Real attacker data:</strong> Not simulated — actual bots and hackers from the internet</li>
+            <li><strong>Rule-based analysis:</strong> DBSCAN clustering + regex-based ATT&CK technique tagging (no AI dependency)</li>
+            <li><strong>Production-grade deployment:</strong> Docker containerized, running on AWS EC2</li>
+            <li><strong>Live dashboard:</strong> Real-time command feed, interactive charts, ATT&CK heatmap</li>
+            <li><strong>19-feature behavioral profiling:</strong> Each session is mathematically profiled for clustering</li>
+            <li><strong>Bot vs. human classification:</strong> Statistical analysis of command timing variance</li>
+        </ul>
+
+        <h3>Questions an interviewer might ask</h3>
+        <table>
+            <thead><tr><th>Question</th><th>Your Answer</th></tr></thead>
+            <tbody>
+                <tr><td>"Why not use ML for classification?"</td><td>"The PRD requires zero AI dependency. Rule-based systems are more predictable, auditable, and don't require training data or API keys."</td></tr>
+                <tr><td>"Why SQLite instead of PostgreSQL?"</td><td>"For a single-node honeypot, SQLite provides zero-config deployment and sufficient performance. It would be upgraded for a distributed system."</td></tr>
+                <tr><td>"How do you tell bots from humans?"</td><td>"I analyze the coefficient of variation in inter-command timing. Bots have near-zero variance; humans have high variance."</td></tr>
+                <tr><td>"What's DBSCAN?"</td><td>"A density-based clustering algorithm that finds groups without needing a predefined number of clusters, and naturally identifies outliers as noise."</td></tr>
+                <tr><td>"Is this legal?"</td><td>"Yes. Running a honeypot on your own server is legal. We only capture data from attackers who voluntarily connect to our system."</td></tr>
+            </tbody>
+        </table>
+
+        <div class="alert alert-tip">
+            <span class="alert-icon">💡</span>
+            <span><strong>Pro tip:</strong> When presenting, have the live dashboard open and show real captured data. Nothing impresses interviewers more than a system that is actively catching real attackers while you present it.</span>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="doc-footer">
+        MIRAGE — Deception Intelligence Platform &nbsp;•&nbsp; Complete Project Documentation &nbsp;•&nbsp; Jaskaran Bandral &nbsp;•&nbsp; July 2026
+    </div>
+
+</div>
+</body>
+</html>

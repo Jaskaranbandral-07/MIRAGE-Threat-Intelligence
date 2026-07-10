@@ -1,0 +1,24 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# SQLite databases (Don't upload the actual honeypot database!)
+*.sqlite3
+*.db
+
+# macOS
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/

@@ -1,0 +1,103 @@
+# ===========================================================================
+#  MIRAGE — Docker Compose Orchestration
+# ===========================================================================
+#  Brings up the full honeypot + decoy + analytics stack:
+#
+#    docker-compose up -d
+#
+#  Services:
+#    cowrie      — SSH honeypot (Cowrie)
+#    decoy       — HTTP decoy server
+#    dashboard   — Flask analytics dashboard
+#    ingestion   — Log ingestion & enrichment pipeline
+# ===========================================================================
+
+version: "3.8"
+
+# ── Named Volumes ──────────────────────────────────────────────────────────
+volumes:
+  mirage-data:
+    driver: local
+  cowrie-logs:
+    driver: local
+
+# ── Isolated Network ──────────────────────────────────────────────────────
+networks:
+  mirage-net:
+    driver: bridge
+
+# ── Services ──────────────────────────────────────────────────────────────
+services:
+
+  # ── Cowrie SSH Honeypot ─────────────────────────────────────────────────
+  cowrie:
+    image: cowrie/cowrie:latest
+    container_name: mirage-cowrie
+    restart: always
+    ports:
+      - "2222:2222"
+    volumes:
+      - cowrie-logs:/home/cowrie/cowrie-git/var/log/cowrie
+    networks:
+      - mirage-net
+    environment:
+      - COWRIE_TELNET_ENABLED=no
+
+  # ── HTTP Decoy Server ──────────────────────────────────────────────────
+  decoy:
+    build:
+      context: .
+      dockerfile: decoy/Dockerfile
+    container_name: mirage-decoy
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - mirage-data:/data
+    networks:
+      - mirage-net
+    environment:
+      - MIRAGE_DB_PATH=/data/mirage.db
+      - DECOY_HOST=0.0.0.0
+      - DECOY_PORT=8080
+    depends_on:
+      - cowrie
+
+  # ── Analytics Dashboard ────────────────────────────────────────────────
+  dashboard:
+    build:
+      context: .
+      dockerfile: dashboard/Dockerfile
+    container_name: mirage-dashboard
+    restart: always
+    ports:
+      - "5000:5000"
+    volumes:
+      - mirage-data:/data
+    networks:
+      - mirage-net
+    environment:
+      - MIRAGE_DB_PATH=/data/mirage.db
+      - DASHBOARD_HOST=0.0.0.0
+      - DASHBOARD_PORT=5000
+      - SECRET_KEY=${SECRET_KEY:-mirage-dashboard-secret}
+    depends_on:
+      - cowrie
+
+  # ── Log Ingestion Pipeline ────────────────────────────────────────────
+  ingestion:
+    build:
+      context: .
+      dockerfile: ingestion/Dockerfile
+    container_name: mirage-ingestion
+    restart: always
+    volumes:
+      - mirage-data:/data
+      - cowrie-logs:/var/log/cowrie:ro
+    networks:
+      - mirage-net
+    environment:
+      - MIRAGE_DB_PATH=/data/mirage.db
+      - COWRIE_LOG_PATH=/var/log/cowrie/cowrie.json
+    depends_on:
+      - cowrie

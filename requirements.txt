@@ -1,0 +1,8 @@
+flask>=3.0
+flask-cors
+watchdog
+pandas
+scikit-learn
+scipy
+gunicorn
+PyJWT

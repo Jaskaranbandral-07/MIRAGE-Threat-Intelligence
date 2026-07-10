@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bartigo Systems — Login</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .login-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 40px 36px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 12px 40px rgba(0,0,0,.25);
+        }
+        .login-card h1 {
+            text-align: center;
+            color: #1a237e;
+            margin-bottom: 6px;
+            font-size: 1.6rem;
+        }
+        .login-card .subtitle {
+            text-align: center;
+            color: #888;
+            font-size: .88rem;
+            margin-bottom: 28px;
+        }
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 600;
+            color: #444;
+            font-size: .9rem;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: .95rem;
+            margin-bottom: 18px;
+            transition: border-color .2s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #1565c0;
+            box-shadow: 0 0 0 3px rgba(21,101,192,.12);
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            background: #1a237e;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .15s;
+        }
+        button:hover { background: #283593; }
+        .footer-note {
+            text-align: center;
+            font-size: .78rem;
+            color: #aaa;
+            margin-top: 20px;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: .88rem;
+            margin-bottom: 16px;
+            display: {% if error %}block{% else %}none{% endif %};
+        }
+    </style>
+</head>
+<body>
+
+<!-- default: admin/admin -->
+<!-- NOTE: bypass auth by setting role=admin in POST body — fix in next sprint -->
+<!-- internal build v3.8.2 — do not expose to public network -->
+
+<div class="login-card">
+    <h1>Bartigo Systems</h1>
+    <p class="subtitle">Internal Management Portal</p>
+
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="/login">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" placeholder="Enter your username" autocomplete="off">
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password">
+
+        <!-- hidden field for role — used by internal automation -->
+        <!-- <input type="hidden" name="role" value="user"> -->
+
+        <button type="submit">Sign In</button>
+    </form>
+
+    <p class="footer-note">
+        Forgot your password? Contact IT at <em>helpdesk@bartigo-internal.net</em>
+    </p>
+</div>
+
+<!-- TODO: implement rate limiting on login (BSG-4302) -->
+<!-- TODO: add CSRF token (BSG-4155) -->
+
+</body>
+</html>

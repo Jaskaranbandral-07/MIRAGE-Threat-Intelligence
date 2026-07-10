@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bartigo Systems — Internal Management Portal</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+        }
+        /* ---- Top navigation bar ---- */
+        nav {
+            background: #1a237e;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 32px;
+            height: 56px;
+            box-shadow: 0 2px 6px rgba(0,0,0,.25);
+        }
+        nav .brand {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: .5px;
+            margin-right: auto;
+        }
+        nav a {
+            color: #cfd8dc;
+            text-decoration: none;
+            margin-left: 24px;
+            font-size: .95rem;
+            transition: color .15s;
+        }
+        nav a:hover { color: #fff; }
+
+        /* ---- Hero section ---- */
+        .hero {
+            background: linear-gradient(135deg, #283593, #1565c0);
+            color: #fff;
+            text-align: center;
+            padding: 64px 24px 48px;
+        }
+        .hero h1 { font-size: 2.2rem; margin-bottom: 12px; }
+        .hero p  { font-size: 1.1rem; opacity: .85; max-width: 600px; margin: 0 auto; }
+
+        /* ---- Cards grid ---- */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            max-width: 960px;
+            margin: -36px auto 48px;
+            padding: 0 24px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 28px 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.08);
+            transition: transform .15s, box-shadow .15s;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 18px rgba(0,0,0,.12);
+        }
+        .card h3 { margin-bottom: 8px; color: #1a237e; }
+        .card p  { font-size: .92rem; color: #666; line-height: 1.5; }
+        .card a  {
+            display: inline-block;
+            margin-top: 14px;
+            color: #1565c0;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: .9rem;
+        }
+        .card a:hover { text-decoration: underline; }
+
+        /* ---- Footer ---- */
+        footer {
+            text-align: center;
+            padding: 24px;
+            font-size: .8rem;
+            color: #999;
+            border-top: 1px solid #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+
+<!-- TODO: remove debug endpoint before production deploy -->
+<!-- Internal build: v3.8.2-rc1 — staging server -->
+
+<nav>
+    <span class="brand">Bartigo Systems</span>
+    <a href="/">Home</a>
+    <a href="/login">Login</a>
+    <a href="/api/users">API Docs</a>
+    <a href="/admin">Admin</a>
+</nav>
+
+<section class="hero">
+    <h1>Internal Management Portal</h1>
+    <p>Centralized dashboard for user management, deployments, and system monitoring. Authorized personnel only.</p>
+</section>
+
+<!-- TODO: lock down /debug/config — currently world-readable -->
+<!-- TODO: rotate JWT signing key (ticket BSG-4417) -->
+
+<div class="cards">
+    <div class="card">
+        <h3>👤 User Management</h3>
+        <p>View, create, and modify user accounts. Manage roles and access levels across the organization.</p>
+        <a href="/api/users">View Users →</a>
+    </div>
+    <div class="card">
+        <h3>🔒 Authentication</h3>
+        <p>Log in to access restricted resources. Session management and token issuance.</p>
+        <a href="/login">Go to Login →</a>
+    </div>
+    <div class="card">
+        <h3>⚙️ Admin Panel</h3>
+        <p>System configuration, service health monitoring, and deployment controls.</p>
+        <a href="/admin">Open Admin →</a>
+    </div>
+</div>
+
+<!-- Deployment notes:
+     API tokens stored in /debug/config (legacy)
+     Default credentials: admin / admin
+     CORS is wide-open for mobile app testing — restrict later
+-->
+
+<footer>
+    &copy; 2024 Bartigo Systems Inc. — Confidential &amp; Internal Use Only
+</footer>
+
+</body>
+</html>

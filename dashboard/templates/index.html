@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIRAGE — Deception Intelligence Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/mirage.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="glass-panel">
+        <div class="logo">
+            <span class="logo-text">MIRAGE</span>
+            <span class="version">v1.0.0</span>
+        </div>
+        <div class="status-indicator">
+            <div class="pulse-dot"></div>
+            <span>SYSTEM ACTIVE</span>
+        </div>
+        <div class="clock" id="clock">00:00:00</div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="dashboard-container">
+        <!-- KPI Cards -->
+        <section class="kpi-grid">
+            <div class="card kpi-card">
+                <div class="kpi-icon">🎯</div>
+                <div class="kpi-content">
+                    <div class="kpi-value" id="kpi-total-sessions">0</div>
+                    <div class="kpi-label">Total Sessions</div>
+                    <div class="kpi-subtext"><span id="kpi-ssh-count">0</span> SSH | <span id="kpi-http-count">0</span> HTTP</div>
+                </div>
+            </div>
+            <div class="card kpi-card">
+                <div class="kpi-icon">🔗</div>
+                <div class="kpi-content">
+                    <div class="kpi-value" id="kpi-active-campaigns">0</div>
+                    <div class="kpi-label">Active Campaigns</div>
+                </div>
+            </div>
+            <div class="card kpi-card">
+                <div class="kpi-icon">⚔️</div>
+                <div class="kpi-content">
+                    <div class="kpi-value" id="kpi-techniques">0</div>
+                    <div class="kpi-label">ATT&CK Techniques</div>
+                </div>
+            </div>
+            <div class="card kpi-card">
+                <div class="kpi-icon">🌐</div>
+                <div class="kpi-content">
+                    <div class="kpi-value" id="kpi-unique-ips">0</div>
+                    <div class="kpi-label">Unique Sources</div>
+                </div>
+            </div>
+            <div class="card kpi-card">
+                <div class="kpi-icon">📊</div>
+                <div class="kpi-content">
+                    <div class="kpi-value" id="kpi-avg-duration">0</div>
+                    <div class="kpi-label">Avg Duration (s)</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts Row -->
+        <section class="charts-row">
+            <div class="card chart-container timeline-chart-container">
+                <div class="section-title">Session Timeline</div>
+                <div class="chart-wrapper"><canvas id="timelineChart"></canvas></div>
+            </div>
+            <div class="card chart-container protocol-chart-container">
+                <div class="section-title">Protocol Distribution</div>
+                <div class="chart-wrapper"><canvas id="protocolChart"></canvas></div>
+            </div>
+        </section>
+
+        <!-- ATT&CK Heatmap -->
+        <section class="card heatmap-section">
+            <div class="section-title">MITRE ATT&CK Matrix Heatmap</div>
+            <div id="heatmap-container">
+                <div class="placeholder-text">Loading heatmap data...</div>
+            </div>
+        </section>
+
+        <!-- Top Techniques & Sources -->
+        <section class="charts-row">
+            <div class="card chart-container">
+                <div class="section-title">Top Attack Techniques</div>
+                <div class="chart-wrapper"><canvas id="topTechniquesChart"></canvas></div>
+            </div>
+            <div class="card chart-container">
+                <div class="section-title">Top Attack Sources</div>
+                <div class="chart-wrapper"><canvas id="topSourcesChart"></canvas></div>
+            </div>
+        </section>
+
+        <!-- Campaigns Panel -->
+        <section class="campaigns-section">
+            <div class="section-title">Discovered Campaigns</div>
+            <div class="campaign-grid" id="campaigns-container">
+                <!-- Campaigns injected here -->
+            </div>
+        </section>
+
+        <!-- Live Feed -->
+        <section class="card live-feed-section">
+            <div class="section-title">Live Command Feed</div>
+            <div class="table-responsive">
+                <table class="data-table" id="live-feed-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Source IP</th>
+                            <th>Protocol</th>
+                            <th>Command / Request</th>
+                            <th>Technique</th>
+                        </tr>
+                    </thead>
+                    <tbody id="live-feed-body">
+                        <!-- Feed items injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Sessions Table -->
+        <section class="card sessions-section">
+            <div class="section-title">All Sessions</div>
+            <div class="table-controls">
+                <select id="filter-protocol">
+                    <option value="">All Protocols</option>
+                    <option value="ssh">SSH</option>
+                    <option value="http">HTTP</option>
+                </select>
+                <div class="pagination">
+                    <button class="glass-btn" id="btn-prev-page">Previous</button>
+                    <span id="page-indicator">Page 1 of 1</span>
+                    <button class="glass-btn" id="btn-next-page">Next</button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Source IP</th>
+                            <th>Protocol</th>
+                            <th>Start Time</th>
+                            <th>Duration</th>
+                            <th>Commands</th>
+                            <th>Cluster</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sessions-table-body">
+                        <!-- Sessions injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Session Detail Modal -->
+    <div class="modal-overlay" id="session-modal">
+        <div class="modal-content card">
+            <button class="modal-close" id="modal-close">×</button>
+            <div class="modal-header">
+                <h2>Session Detail</h2>
+                <div class="modal-meta" id="modal-meta">
+                    <!-- Meta info injected here -->
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="section-title">Command Timeline</div>
+                <div class="command-list" id="modal-command-list">
+                    <!-- Commands injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="/static/js/heatmap.js"></script>
+    <script src="/static/js/mirage.js"></script>
+</body>
+</html>
