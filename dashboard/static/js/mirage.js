@@ -488,6 +488,7 @@ async function loadProtocolBreakdown() {
             renderProtocolChart(data, colors);
             
             // Render bottom pie chart
+            const isMobile = window.innerWidth < 768;
             const ctx = document.getElementById('protocolBreakdownChart').getContext('2d');
             new Chart(ctx, {
                 type: 'doughnut',
@@ -504,7 +505,7 @@ async function loadProtocolBreakdown() {
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            position: 'right',
+                            position: isMobile ? 'bottom' : 'right',
                             labels: { color: '#94a3b8', padding: 12, font: { size: 11 } }
                         }
                     }

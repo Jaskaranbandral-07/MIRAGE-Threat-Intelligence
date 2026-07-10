@@ -574,7 +574,7 @@ tr.row-http { background: rgba(255, 159, 28, 0.02); }
   .status-indicator span { display: none; }
   .kpi-card { padding: var(--gap-sm); gap: var(--gap-sm); }
   .section-title { font-size: 0.75rem; }
-  .chart-container { height: 300px; padding: var(--gap-sm); }
+  .chart-container { height: 420px; padding: var(--gap-sm); }
   section { padding: var(--gap-sm); }
 }
 
