@@ -168,21 +168,35 @@ async def handle_telnet(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
         writer.write(b"\r\nlogin: ")
         await writer.drain()
 
-        username_data = await asyncio.wait_for(reader.readline(), timeout=60)
-        # Strip Telnet IAC negotiations (0xFF followed by 1 or 2 bytes depending on command)
-        if username_data:
-            username_data = re.sub(b'\xff[\xfb-\xfe].', b'', username_data)
-            username_data = re.sub(b'\xff[\xf0-\xfa]', b'', username_data)
-        username = username_data.decode("utf-8", errors="ignore").strip() if username_data else ""
+        username = ""
+        for _ in range(5):
+            username_data = await asyncio.wait_for(reader.readline(), timeout=60)
+            if not username_data:
+                break
+            # Strip Telnet IAC negotiations (including subnegotiations)
+            cleaned = re.sub(rb'\xff\xfa.*?\xff\xf0', b'', username_data, flags=re.DOTALL)
+            cleaned = re.sub(rb'\xff[\xfb-\xfe].', b'', cleaned)
+            cleaned = re.sub(rb'\xff[\xf0-\xfa]', b'', cleaned)
+            text = cleaned.decode("utf-8", errors="ignore").strip()
+            if text:
+                username = text
+                break
 
         writer.write(b"Password: ")
         await writer.drain()
 
-        password_data = await asyncio.wait_for(reader.readline(), timeout=60)
-        if password_data:
-            password_data = re.sub(b'\xff[\xfb-\xfe].', b'', password_data)
-            password_data = re.sub(b'\xff[\xf0-\xfa]', b'', password_data)
-        password = password_data.decode("utf-8", errors="ignore").strip() if password_data else ""
+        password = ""
+        for _ in range(5):
+            password_data = await asyncio.wait_for(reader.readline(), timeout=60)
+            if not password_data:
+                break
+            cleaned = re.sub(rb'\xff\xfa.*?\xff\xf0', b'', password_data, flags=re.DOTALL)
+            cleaned = re.sub(rb'\xff[\xfb-\xfe].', b'', cleaned)
+            cleaned = re.sub(rb'\xff[\xf0-\xfa]', b'', cleaned)
+            text = cleaned.decode("utf-8", errors="ignore").strip()
+            if text:
+                password = text
+                break
 
         log_event(
             "login_attempt", src_ip, src_port, "telnet",
