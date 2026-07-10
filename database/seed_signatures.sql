@@ -286,13 +286,19 @@ INSERT OR IGNORE INTO technique_signatures (pattern, attack_technique_id, techni
 ('^GET\b', 'T1592.004', 'Gather Victim Network Information: Client Configurations');
 
 INSERT OR IGNORE INTO technique_signatures (pattern, attack_technique_id, technique_name) VALUES
-('^AUTH\s+(?:TLS|SSL)\b', 'T1592.004', 'Gather Victim Network Information: Client Configurations');
+('^(?:AUTH\s+|USER\s+|PASS\s+)', 'T1592.004', 'Gather Victim Network Information: Client Configurations');
 
 INSERT OR IGNORE INTO technique_signatures (pattern, attack_technique_id, technique_name) VALUES
-('^RFB\s+', 'T1592.004', 'Gather Victim Network Information: Client Configurations');
+('^(?:RFB|security_type|MGLNDD)', 'T1592.004', 'Gather Victim Network Information: Client Configurations');
 
 INSERT OR IGNORE INTO technique_signatures (pattern, attack_technique_id, technique_name) VALUES
-('^(?:DATA|Data)\b', 'T1048', 'Exfiltration Over Alternative Protocol');
+('^(?:EHLO|HELO|STARTTLS|QUIT|MAIL FROM|RCPT TO)\b', 'T1592.004', 'Gather Victim Network Information: Client Configurations');
+
+INSERT OR IGNORE INTO technique_signatures (pattern, attack_technique_id, technique_name) VALUES
+('^DATA\b', 'T1048', 'Exfiltration Over Alternative Protocol');
+
+INSERT OR IGNORE INTO technique_signatures (pattern, attack_technique_id, technique_name) VALUES
+('^$', 'T1592.004', 'Gather Victim Network Information: Client Configurations');
 
 
 -- ── T1078 - Valid Accounts ──────────────────────────────────────────────────
