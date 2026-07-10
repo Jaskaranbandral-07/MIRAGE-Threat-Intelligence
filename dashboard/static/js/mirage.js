@@ -114,9 +114,12 @@ async function loadStats() {
         const res = await fetch('/api/stats');
         const data = await res.json();
         
-        if (data.credentials_captured !== undefined) {
-            animateValue(document.getElementById('kpi-credentials'), 0, data.credentials_captured, 1500);
-        }
+        if (data.total_sessions !== undefined) animateValue(document.getElementById('kpi-total-sessions'), 0, data.total_sessions, 1500);
+        if (data.active_clusters !== undefined) animateValue(document.getElementById('kpi-active-campaigns'), 0, data.active_clusters, 1500);
+        if (data.techniques_matched !== undefined) animateValue(document.getElementById('kpi-techniques'), 0, data.techniques_matched, 1500);
+        if (data.unique_ips !== undefined) animateValue(document.getElementById('kpi-unique-ips'), 0, data.unique_ips, 1500);
+        if (data.avg_session_duration !== undefined) animateValue(document.getElementById('kpi-avg-duration'), 0, data.avg_session_duration, 1500);
+        if (data.credentials_captured !== undefined) animateValue(document.getElementById('kpi-credentials'), 0, data.credentials_captured, 1500);
     } catch (e) { console.error('Error loading stats:', e); }
 }
 
