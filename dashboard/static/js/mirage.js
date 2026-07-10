@@ -305,7 +305,7 @@ async function loadSessionsTable() {
                 <td class="code-cell">${s.source_ip}</td>
                 <td>${createBadge(s.protocol.toUpperCase(), s.protocol)}</td>
                 <td>${formatTime(s.start_time)}</td>
-                <td>${formatDuration(s.duration_seconds)}</td>
+                <td>${s.is_bot && s.is_bot !== 'unknown' ? createBadge(s.is_bot.toUpperCase(), s.is_bot) : '-'}</td>
                 <td>${s.command_count}</td>
                 <td>${s.cluster_label || '-'}</td>
                 <td><button class="glass-btn" onclick="openSessionDetail(${s.session_id})">View</button></td>

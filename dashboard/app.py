@@ -119,7 +119,16 @@ def api_sessions():
     
     sessions = []
     for row in rows:
-        sessions.append(dict(row))
+        session_dict = dict(row)
+        if HAS_BOT_DETECTION and Config.ENABLE_BOT_DETECTION:
+            try:
+                from analytics.bot_detector import classify_session
+                session_dict['is_bot'] = classify_session(session_dict['session_id'])
+            except Exception:
+                session_dict['is_bot'] = 'unknown'
+        else:
+            session_dict['is_bot'] = 'unknown'
+        sessions.append(session_dict)
         
     return jsonify({
         "sessions": sessions,
