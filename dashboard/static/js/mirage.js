@@ -114,21 +114,9 @@ async function loadStats() {
         const res = await fetch('/api/stats');
         const data = await res.json();
         
-        animateValue(document.getElementById('kpi-total-sessions'), 0, data.total_sessions, 1500);
-        document.getElementById('kpi-ssh-count').textContent = data.ssh_sessions;
-        document.getElementById('kpi-http-count').textContent = data.http_sessions;
-        
-        animateValue(document.getElementById('kpi-active-campaigns'), 0, data.active_clusters, 1500);
-        animateValue(document.getElementById('kpi-techniques'), 0, data.techniques_matched, 1500);
-        animateValue(document.getElementById('kpi-unique-ips'), 0, data.unique_ips, 1500);
-        
-        document.getElementById('kpi-avg-duration').textContent = data.avg_session_duration.toFixed(1);
-        
         if (data.credentials_captured !== undefined) {
             animateValue(document.getElementById('kpi-credentials'), 0, data.credentials_captured, 1500);
         }
-        
-        renderProtocolChart(data.ssh_sessions, data.http_sessions);
     } catch (e) { console.error('Error loading stats:', e); }
 }
 
@@ -139,36 +127,51 @@ async function loadTimeline() {
         
         const ctx = document.getElementById('timelineChart').getContext('2d');
         
-        const gradientSSH = ctx.createLinearGradient(0, 0, 0, 300);
-        gradientSSH.addColorStop(0, 'rgba(0, 240, 255, 0.4)');
-        gradientSSH.addColorStop(1, 'rgba(0, 240, 255, 0.0)');
-        
-        const gradientHTTP = ctx.createLinearGradient(0, 0, 0, 300);
-        gradientHTTP.addColorStop(0, 'rgba(255, 159, 28, 0.4)');
-        gradientHTTP.addColorStop(1, 'rgba(255, 159, 28, 0.0)');
+        const colors = {
+            'ssh': '#00f0ff',
+            'http': '#ff9f1c',
+            'ftp': '#7c3aed',
+            'telnet': '#f43f5e',
+            'smtp': '#10b981',
+            'vnc': '#f59e0b',
+            'wordpress': '#3b82f6',
+            'elasticsearch': '#8b5cf6',
+            'adb': '#ec4899'
+        };
+
+        const chartDatasets = Object.keys(data.datasets).map(proto => {
+            const baseColor = colors[proto.toLowerCase()] || '#94a3b8';
+            
+            // Create gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            
+            // We need to convert hex to rgba for gradient
+            let r=0, g=0, b=0;
+            if (baseColor.startsWith('#')) {
+                const hex = baseColor.replace('#', '');
+                r = parseInt(hex.substring(0, 2), 16);
+                g = parseInt(hex.substring(2, 4), 16);
+                b = parseInt(hex.substring(4, 6), 16);
+            }
+            
+            gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.4)`);
+            gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0.0)`);
+            
+            return {
+                label: proto.toUpperCase() + ' Sessions',
+                data: data.datasets[proto],
+                borderColor: baseColor,
+                backgroundColor: gradient,
+                fill: true,
+                tension: 0.4
+            };
+        });
         
         new Chart(ctx, {
             type: 'line',
             data: {
                 labels: data.labels,
-                datasets: [
-                    {
-                        label: 'SSH Sessions',
-                        data: data.ssh,
-                        borderColor: '#00f0ff',
-                        backgroundColor: gradientSSH,
-                        fill: true,
-                        tension: 0.4
-                    },
-                    {
-                        label: 'HTTP Sessions',
-                        data: data.http,
-                        borderColor: '#ff9f1c',
-                        backgroundColor: gradientHTTP,
-                        fill: true,
-                        tension: 0.4
-                    }
-                ]
+                datasets: chartDatasets
             },
             options: {
                 responsive: true,
@@ -180,15 +183,15 @@ async function loadTimeline() {
     } catch (e) { console.error('Error loading timeline:', e); }
 }
 
-function renderProtocolChart(ssh, http) {
+function renderProtocolChart(dataRows, colors) {
     const ctx = document.getElementById('protocolChart').getContext('2d');
     new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ['SSH', 'HTTP'],
+            labels: dataRows.map(d => d.protocol.toUpperCase()),
             datasets: [{
-                data: [ssh, http],
-                backgroundColor: ['#00f0ff', '#ff9f1c'],
+                data: dataRows.map(d => d.count),
+                backgroundColor: dataRows.map(d => colors[d.protocol] || '#64748b'),
                 borderWidth: 0,
                 hoverOffset: 4
             }]
@@ -197,7 +200,7 @@ function renderProtocolChart(ssh, http) {
             responsive: true,
             maintainAspectRatio: false,
             cutout: '75%',
-            plugins: { legend: { position: 'bottom' } }
+            plugins: { legend: { position: 'bottom', labels: { padding: 12, font: { size: 10 } } } }
         }
     });
 }
@@ -470,11 +473,18 @@ async function loadProtocolBreakdown() {
         const data = await res.json();
         
         if (data.length > 0) {
+            document.getElementById('kpi-protocol-summary').textContent = `${data.length} Protocols Active`;
+            
             const colors = {
                 ssh: '#00f0ff', http: '#ff9f1c', ftp: '#7c3aed', telnet: '#f43f5e',
                 smtp: '#10b981', vnc: '#f59e0b', wordpress: '#3b82f6',
                 elasticsearch: '#8b5cf6', adb: '#ec4899'
             };
+            
+            // Render top pie chart
+            renderProtocolChart(data, colors);
+            
+            // Render bottom pie chart
             const ctx = document.getElementById('protocolBreakdownChart').getContext('2d');
             new Chart(ctx, {
                 type: 'doughnut',

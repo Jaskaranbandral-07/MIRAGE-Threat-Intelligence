@@ -310,20 +310,23 @@ def api_timeline():
     rows = cursor.fetchall()
     
     timeline_data = {}
+    protocols_seen = set()
     for row in rows:
         date = row['date']
+        proto = row['protocol']
+        protocols_seen.add(proto)
         if date not in timeline_data:
-            timeline_data[date] = {'ssh': 0, 'http': 0}
-        timeline_data[date][row['protocol']] = row['count']
+            timeline_data[date] = {}
+        timeline_data[date][proto] = row['count']
         
     labels = sorted(list(timeline_data.keys()))
-    ssh_data = [timeline_data[label]['ssh'] for label in labels]
-    http_data = [timeline_data[label]['http'] for label in labels]
+    datasets = {}
+    for p in protocols_seen:
+        datasets[p] = [timeline_data[label].get(p, 0) for label in labels]
     
     return jsonify({
         "labels": labels,
-        "ssh": ssh_data,
-        "http": http_data
+        "datasets": datasets
     })
 
 @app.route('/api/geo')
