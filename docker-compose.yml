@@ -20,6 +20,8 @@ volumes:
     driver: local
   cowrie-logs:
     driver: local
+  honeypot-logs:
+    driver: local
 
 # ── Isolated Network ──────────────────────────────────────────────────────
 networks:
@@ -84,6 +86,61 @@ services:
     depends_on:
       - cowrie
 
+  # ── Credential Trap (FTP/Telnet/SMTP/VNC) ───────────────────────────
+  credential-trap:
+    build:
+      context: ./honeypots/credential_trap
+    container_name: mirage-credential-trap
+    restart: always
+    ports:
+      - "21:21"
+      - "23:23"
+      - "25:25"
+      - "5900:5900"
+    volumes:
+      - honeypot-logs:/var/log/honeypot
+    networks:
+      - mirage-net
+
+  # ── WordPress Honeypot ─────────────────────────────────────────────
+  wordpot:
+    build:
+      context: ./honeypots/wordpot
+    container_name: mirage-wordpot
+    restart: always
+    ports:
+      - "8081:8081"
+    volumes:
+      - honeypot-logs:/var/log/honeypot
+    networks:
+      - mirage-net
+
+  # ── Elasticsearch Honeypot ─────────────────────────────────────────
+  elasticpot:
+    build:
+      context: ./honeypots/elasticpot
+    container_name: mirage-elasticpot
+    restart: always
+    ports:
+      - "9200:9200"
+    volumes:
+      - honeypot-logs:/var/log/honeypot
+    networks:
+      - mirage-net
+
+  # ── Android Debug Bridge Honeypot ──────────────────────────────────
+  adbhoney:
+    build:
+      context: ./honeypots/adbhoney
+    container_name: mirage-adbhoney
+    restart: always
+    ports:
+      - "5555:5555"
+    volumes:
+      - honeypot-logs:/var/log/honeypot
+    networks:
+      - mirage-net
+
   # ── Log Ingestion Pipeline ────────────────────────────────────────────
   ingestion:
     build:
@@ -94,6 +151,7 @@ services:
     volumes:
       - mirage-data:/data
       - cowrie-logs:/var/log/cowrie:ro
+      - honeypot-logs:/var/log/honeypot:ro
     networks:
       - mirage-net
     environment:

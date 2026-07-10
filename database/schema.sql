@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS clusters (
 CREATE TABLE IF NOT EXISTS sessions (
     session_id        INTEGER PRIMARY KEY AUTOINCREMENT,
     source_ip         TEXT NOT NULL,
-    protocol          TEXT NOT NULL CHECK (protocol IN ('ssh', 'http')),
+    protocol          TEXT NOT NULL CHECK (protocol IN ('ssh', 'http', 'ftp', 'telnet', 'smtp', 'vnc', 'wordpress', 'elasticsearch', 'adb')),
     start_time        DATETIME NOT NULL,
     end_time          DATETIME,
     duration_seconds  INTEGER,
@@ -47,6 +47,18 @@ CREATE TABLE IF NOT EXISTS commands (
     raw_input            TEXT NOT NULL,
     timestamp            DATETIME NOT NULL,
     time_since_prev_ms   INTEGER,
+    FOREIGN KEY (session_id) REFERENCES sessions(session_id)
+);
+
+CREATE TABLE IF NOT EXISTS credentials (
+    credential_id    INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_id       INTEGER,
+    source_ip        TEXT NOT NULL,
+    protocol         TEXT NOT NULL,
+    username         TEXT,
+    password         TEXT,
+    timestamp        DATETIME NOT NULL,
+    success          BOOLEAN DEFAULT 0,
     FOREIGN KEY (session_id) REFERENCES sessions(session_id)
 );
 
@@ -72,3 +84,4 @@ CREATE INDEX IF NOT EXISTS idx_sessions_source_ip ON sessions(source_ip);
 CREATE INDEX IF NOT EXISTS idx_sessions_cluster_id ON sessions(cluster_id);
 CREATE INDEX IF NOT EXISTS idx_commands_session_id ON commands(session_id);
 CREATE INDEX IF NOT EXISTS idx_session_techniques_session ON session_techniques(session_id);
+CREATE INDEX IF NOT EXISTS idx_credentials_source_ip ON credentials(source_ip);

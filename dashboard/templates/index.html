@@ -63,6 +63,13 @@
                     <div class="kpi-label">Avg Duration (s)</div>
                 </div>
             </div>
+            <div class="kpi-card card">
+                <div class="kpi-icon">🔑</div>
+                <div class="kpi-content">
+                    <div class="kpi-value" id="kpi-credentials">0</div>
+                    <div class="kpi-label">Credentials Captured</div>
+                </div>
+            </div>
         </section>
 
         <!-- Charts Row -->
@@ -74,6 +81,39 @@
             <div class="card chart-container protocol-chart-container">
                 <div class="section-title">Protocol Distribution</div>
                 <div class="chart-wrapper"><canvas id="protocolChart"></canvas></div>
+            </div>
+        </section>
+
+        <!-- Captured Credentials -->
+        <section class="card credentials-section">
+            <h2 class="section-title">Captured Credentials</h2>
+            <div class="charts-row">
+                <div class="chart-container card">
+                    <h3 class="section-title">Top Attempted Passwords</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="credentialsChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container card">
+                    <h3 class="section-title">Protocol Breakdown</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="protocolBreakdownChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto; margin-top: 1.25rem;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Source IP</th>
+                            <th>Protocol</th>
+                            <th>Username</th>
+                            <th>Password</th>
+                        </tr>
+                    </thead>
+                    <tbody id="credentials-table-body"></tbody>
+                </table>
             </div>
         </section>
 
@@ -134,6 +174,13 @@
                     <option value="">All Protocols</option>
                     <option value="ssh">SSH</option>
                     <option value="http">HTTP</option>
+                    <option value="ftp">FTP</option>
+                    <option value="telnet">Telnet</option>
+                    <option value="smtp">SMTP</option>
+                    <option value="vnc">VNC</option>
+                    <option value="wordpress">WordPress</option>
+                    <option value="elasticsearch">Elasticsearch</option>
+                    <option value="adb">ADB</option>
                 </select>
                 <div class="pagination">
                     <button class="glass-btn" id="btn-prev-page">Previous</button>

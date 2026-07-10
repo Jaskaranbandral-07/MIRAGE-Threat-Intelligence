@@ -58,6 +58,12 @@ def api_stats():
     cursor.execute("SELECT AVG(duration_seconds) AS avg_duration FROM sessions WHERE duration_seconds IS NOT NULL")
     avg_session_duration = cursor.fetchone()['avg_duration'] or 0
     
+    # Credential count (may not exist yet)
+    try:
+        credential_count = cursor.execute('SELECT COUNT(*) FROM credentials').fetchone()[0]
+    except Exception:
+        credential_count = 0
+    
     return jsonify({
         "total_sessions": total_sessions,
         "ssh_sessions": ssh_sessions,
@@ -66,7 +72,8 @@ def api_stats():
         "techniques_matched": techniques_matched,
         "unique_ips": unique_ips,
         "total_commands": total_commands,
-        "avg_session_duration": round(avg_session_duration, 1)
+        "avg_session_duration": round(avg_session_duration, 1),
+        "credentials_captured": credential_count
     })
 
 @app.route('/api/sessions')
@@ -380,6 +387,54 @@ def api_live():
             time.sleep(Config.DASHBOARD_REFRESH_INTERVAL)
             
     return Response(generate(), mimetype="text/event-stream")
+
+@app.route('/api/credentials')
+def api_credentials():
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        cursor.execute("""
+            SELECT credential_id, source_ip, protocol, username, password, timestamp, success
+            FROM credentials
+            ORDER BY timestamp DESC
+            LIMIT 100
+        """)
+        rows = cursor.fetchall()
+        return jsonify([dict(r) for r in rows])
+    except Exception:
+        return jsonify([])
+
+@app.route('/api/credentials/top')
+def api_credentials_top():
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        # Top 10 most attempted username/password combos
+        cursor.execute("""
+            SELECT username, password, COUNT(*) as attempts
+            FROM credentials
+            WHERE username IS NOT NULL
+            GROUP BY username, password
+            ORDER BY attempts DESC
+            LIMIT 10
+        """)
+        rows = cursor.fetchall()
+        return jsonify([dict(r) for r in rows])
+    except Exception:
+        return jsonify([])
+
+@app.route('/api/protocols/breakdown')
+def api_protocol_breakdown():
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("""
+        SELECT protocol, COUNT(*) as count
+        FROM sessions
+        GROUP BY protocol
+        ORDER BY count DESC
+    """)
+    rows = cursor.fetchall()
+    return jsonify([dict(r) for r in rows])
 
 if __name__ == '__main__':
     # Ensure DB is initialized

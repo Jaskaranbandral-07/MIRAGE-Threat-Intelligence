@@ -103,7 +103,9 @@ async function loadAllData() {
         loadClusters(),
         loadSessionsTable(),
         loadLiveFeedInit(),
-        loadHeatmapData()
+        loadHeatmapData(),
+        loadCredentials(),
+        loadProtocolBreakdown()
     ]);
 }
 
@@ -121,6 +123,10 @@ async function loadStats() {
         animateValue(document.getElementById('kpi-unique-ips'), 0, data.unique_ips, 1500);
         
         document.getElementById('kpi-avg-duration').textContent = data.avg_session_duration.toFixed(1);
+        
+        if (data.credentials_captured !== undefined) {
+            animateValue(document.getElementById('kpi-credentials'), 0, data.credentials_captured, 1500);
+        }
         
         renderProtocolChart(data.ssh_sessions, data.http_sessions);
     } catch (e) { console.error('Error loading stats:', e); }
@@ -401,6 +407,98 @@ async function loadHeatmapData() {
             renderHeatmap('heatmap-container', data);
         }
     } catch (e) { console.error('Error loading heatmap:', e); }
+}
+
+async function loadCredentials() {
+    try {
+        // Load top credentials chart
+        const topRes = await fetch('/api/credentials/top');
+        const topData = await topRes.json();
+        
+        if (topData.length > 0) {
+            const ctx = document.getElementById('credentialsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: topData.map(d => d.username + '/' + d.password),
+                    datasets: [{
+                        label: 'Attempts',
+                        data: topData.map(d => d.attempts),
+                        backgroundColor: 'rgba(124, 58, 237, 0.6)',
+                        borderColor: '#7c3aed',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        y: { ticks: { color: '#a5f3fc', font: { family: 'JetBrains Mono', size: 11 } }, grid: { display: false } }
+                    }
+                }
+            });
+        }
+        
+        // Load credentials table
+        const res = await fetch('/api/credentials');
+        const data = await res.json();
+        const tbody = document.getElementById('credentials-table-body');
+        if (tbody) {
+            tbody.innerHTML = '';
+            data.forEach(c => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${formatTime(c.timestamp)}</td>
+                    <td class="code-cell">${c.source_ip}</td>
+                    <td>${createBadge(c.protocol.toUpperCase(), c.protocol)}</td>
+                    <td class="code-cell">${c.username || '-'}</td>
+                    <td class="code-cell">${c.password || '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    } catch (e) { console.error('Error loading credentials:', e); }
+}
+
+async function loadProtocolBreakdown() {
+    try {
+        const res = await fetch('/api/protocols/breakdown');
+        const data = await res.json();
+        
+        if (data.length > 0) {
+            const colors = {
+                ssh: '#00f0ff', http: '#ff9f1c', ftp: '#7c3aed', telnet: '#f43f5e',
+                smtp: '#10b981', vnc: '#f59e0b', wordpress: '#3b82f6',
+                elasticsearch: '#8b5cf6', adb: '#ec4899'
+            };
+            const ctx = document.getElementById('protocolBreakdownChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.map(d => d.protocol.toUpperCase()),
+                    datasets: [{
+                        data: data.map(d => d.count),
+                        backgroundColor: data.map(d => colors[d.protocol] || '#64748b'),
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { color: '#94a3b8', padding: 12, font: { size: 11 } }
+                        }
+                    }
+                }
+            });
+        }
+    } catch (e) { console.error('Error loading protocol breakdown:', e); }
 }
 
 // --- Modal ---
