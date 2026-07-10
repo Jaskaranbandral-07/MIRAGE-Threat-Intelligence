@@ -404,30 +404,28 @@
        ▼
 
   <span class="white">STEP 2: ATTACKER CONNECTS</span>
-  ┌────────────────────────┐    ┌────────────────────────┐
-  │  <span class="cyan">SSH on Port 2222</span>       │    │  <span class="amber">HTTP on Port 8080</span>     │
-  │  Attacker types:       │    │  Scanner requests:     │
-  │  $ ssh root@your-ip    │    │  GET /.env             │
-  │  Password: admin       │    │  GET /admin            │
-  │  $ cat /etc/passwd     │    │  POST /login           │
-  └──────────┬─────────────┘    └──────────┬─────────────┘
-             │                              │
-             ▼                              ▼
-  <span class="white">STEP 3: DATA IS CAPTURED</span>
-  ┌────────────────────────┐    ┌────────────────────────┐
-  │  <span class="cyan">COWRIE</span> writes a JSON    │    │  <span class="amber">FLASK DECOY</span> middleware │
-  │  log file with every   │    │  writes directly to    │
-  │  command + timing      │    │  the SQLite database   │
-  └──────────┬─────────────┘    └──────────┬─────────────┘
+  ┌────────────────────────┐    ┌────────────────────────┐    ┌────────────────────────┐
+  │  <span class="cyan">SSH on Port 2222</span>       │    │  <span class="amber">HTTP on Port 8080</span>     │    │  <span class="rose">FTP/Telnet/SMTP/VNC</span>  │
+  │  Attacker types:       │    │  Scanner requests:     │    │  Brute force logins    │
+  │  $ ssh root@your-ip    │    │  GET /.env             │    │  (Credential Trap)     │
+  └──────────┬─────────────┘    └──────────┬─────────────┘    └──────────┬─────────────┘
+             │                              │                              │
+             ▼                              ▼                              ▼
+  <span class="white">STEP 3: DATA IS CAPTURED (Also includes Wordpot, Elasticpot, ADBHoney)</span>
+  ┌────────────────────────┐    ┌────────────────────────┐    ┌────────────────────────┐
+  │  <span class="cyan">COWRIE</span> writes a JSON    │    │  <span class="amber">FLASK DECOY</span> middleware │    │  <span class="rose">CREDENTIAL TRAP</span> logs │
+  │  log file with every   │    │  writes directly to    │    │  to honeypot.log file  │
+  │  command + timing      │    │  the SQLite database   │    │                        │
+  └──────────┬─────────────┘    └──────────┬─────────────┘    └──────────┬─────────────┘
              │                              │
              ▼                              │
-  <span class="white">STEP 4: INGESTION ENGINE</span>                 │
-  ┌────────────────────────┐               │
-  │  <span class="emerald">COWRIE WATCHER</span>         │               │
-  │  Reads Cowrie's JSON   │               │
-  │  log, normalizes it,   │               │
-  │  and writes to DB      ├───────────────┤
-  └────────────────────────┘               │
+  <span class="white">STEP 4: INGESTION ENGINE</span>                                             │
+  ┌────────────────────────┐                                           │
+  │  <span class="emerald">UNIFIED WATCHER</span>        │                                           │
+  │  Reads Cowrie & Trap   │                                           │
+  │  logs, normalizes them,│                                           │
+  │  and writes to DB      ├───────────────────────────────────────────┤
+  └────────────────────────┘                                           │
                                            ▼
   <span class="white">STEP 5: DATA STORED IN DATABASE</span>
   ┌────────────────────────────────────────────────────┐
@@ -491,9 +489,15 @@
 │       ├── <span class="file">login.html</span>     <span class="desc">── Vulnerable login form</span>
 │       └── <span class="file">admin.html</span>     <span class="desc">── Fake admin panel</span>
 │
-├── <span class="folder">ingestion/</span>             <span class="desc">── Reads Cowrie logs into the database</span>
-│   ├── <span class="file">unified_watcher.py</span>  <span class="desc">── Watches and parses the JSON logs</span>
+├── <span class="folder">ingestion/</span>             <span class="desc">── Reads logs into the database</span>
+│   ├── <span class="file">unified_watcher.py</span>  <span class="desc">── Watches and parses all honeypot logs</span>
 │   └── <span class="file">Dockerfile</span>         <span class="desc">── Docker build instructions</span>
+│
+├── <span class="folder">honeypots/</span>             <span class="desc">── Third-party and custom honeypots</span>
+│   ├── <span class="folder">credential_trap/</span>   <span class="desc">── FTP/Telnet/SMTP/VNC</span>
+│   ├── <span class="folder">wordpot/</span>           <span class="desc">── WordPress vulnerabilities</span>
+│   ├── <span class="folder">elasticpot/</span>        <span class="desc">── Elasticsearch vulnerabilities</span>
+│   └── <span class="folder">adbhoney/</span>          <span class="desc">── Android Debug Bridge</span>
 │
 ├── <span class="folder">analytics/</span>             <span class="desc">── Math-based analysis of captured data</span>
 │   ├── <span class="file">clustering.py</span>     <span class="desc">── DBSCAN algorithm to group attackers</span>
