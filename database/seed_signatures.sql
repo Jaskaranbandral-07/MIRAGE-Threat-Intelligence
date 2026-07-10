@@ -289,3 +289,9 @@ INSERT OR IGNORE INTO technique_signatures (pattern, attack_technique_id, techni
 
 INSERT OR IGNORE INTO technique_signatures (pattern, attack_technique_id, technique_name) VALUES
 ('(?:GET\s+\/\s+HTTP.*\r?\n(?:.*\r?\n)*?User-Agent:\s*$|GET\s+\/\s+HTTP.*\r?\n(?:.*\r?\n)*?User-Agent:\s*-)', 'T1498', 'Network Denial of Service: Empty User-Agent Flood');
+
+-- ── T1110 - Brute Force (Honeypot Logins) ──────────────────────────────────
+
+INSERT OR IGNORE INTO technique_signatures (pattern, attack_technique_id, technique_name) VALUES
+('LOGIN FAILED:', 'T1110.001', 'Brute Force: Password Guessing');
+
