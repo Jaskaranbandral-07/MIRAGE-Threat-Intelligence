@@ -23,7 +23,7 @@ The platform is designed to capture everything from automated botnet scanning to
 | Honeypot | Protocol | Port | Purpose |
 |---|---|---|---|
 | **Cowrie** | SSH | 2222 | Captures SSH brute-forcing and interactive shell sessions |
-| **Heralding** | FTP, Telnet, SMTP, VNC | 21, 23, 25, 5900 | High-fidelity credential capture across legacy protocols |
+| **Credential Trap** | FTP, Telnet, SMTP, VNC | 21, 23, 25, 5900 | High-fidelity credential capture across legacy protocols (Custom built) |
 | **Wordpot** | HTTP (WordPress) | 8081 | Emulates a vulnerable WP site to trap scanners and brute-forcers |
 | **Elasticpot** | HTTP (Elasticsearch) | 9200 | Fake DB cluster to catch data thieves and ransomware droppers |
 | **ADBHoney** | ADB | 5555 | Fake Android debug bridge to catch IoT botnets (Mirai/Ares) |
@@ -34,7 +34,7 @@ The platform is designed to capture everything from automated botnet scanning to
 | Capability | Description |
 |---|---|
 | 📊 **Unified Dashboard** | Real-time Flask dashboard visualizing data from all 6 honeypots |
-| 🔍 **MITRE ATT&CK Mapping** | 80+ regex signatures automatically map shell & HTTP commands to ATT&CK |
+| 🔍 **MITRE ATT&CK Mapping** | 100+ regex signatures automatically map shell, HTTP, & legacy commands to ATT&CK |
 | 🔑 **Credential Tracking** | Aggregates and ranks the top passwords attempted by hackers |
 | 🤖 **Bot Detection** | Statistical heuristics (inter-keystroke timing) distinguish bots from humans |
 | 📡 **Live Feed** | Real-time event feed of all attacks hitting the network |
@@ -49,7 +49,7 @@ The platform is designed to capture everything from automated botnet scanning to
     Internet               │                                                        │
     ────────►  :2222  ─────┤──► Cowrie (SSH)                                        │
     ────────►  :8080  ─────┤──► Decoy (HTTP)               ┌────────────────────┐   │
-    ────────►  :21,23 ─────┤──► Heralding (FTP/Telnet/etc) │                    │   │
+    ────────►  :21,23 ─────┤──► Credential Trap            │                    │   │
     ────────►  :8081  ─────┤──► Wordpot (WordPress)  ──────►  honeypot-logs vol │   │
     ────────►  :9200  ─────┤──► Elasticpot (DB)            │                    │   │
     ────────►  :5555  ─────┤──► ADBHoney (IoT)             └─────────┬──────────┘   │

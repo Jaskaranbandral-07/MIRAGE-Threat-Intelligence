@@ -11,9 +11,9 @@
 MIRAGE is a comprehensive live deception network exposed on an isolated cloud VM. It doesn't stop at logging what attackers do. It stores every session across multiple protocols (SSH, HTTP, FTP, Telnet, SMTP, VNC, ADB, etc.) in a normalized relational database, statistically groups sessions into distinct attacker "campaigns," and tags each session with the MITRE ATT&CK techniques it exhibited — using rule-based signature matching, not a language model.
 
 The network deliberately reintroduces real vulnerabilities across multiple honeypots:
-- **Cowrie**: SSH brute-forcing and interactive shell.
-- **Heralding**: Legacy credential harvesting (FTP, Telnet, SMTP, VNC).
-- **Wordpot**: A simulated vulnerable WordPress blog.
+- **Cowrie**: Interactive SSH honeypot.
+- **Credential Trap**: Custom-built asynchronous credential harvesting (FTP, Telnet, SMTP, VNC).
+- **Wordpot**: WordPress honeypot simulating vulnerable plugins.
 - **Elasticpot**: An exposed Elasticsearch database.
 - **ADBHoney**: An exposed Android Debug Bridge to trap IoT malware.
 - **Flask Decoy**: A custom web app with an exposed JWT secret, authentication bypass, and permissive CORS.
@@ -41,7 +41,7 @@ Personal portfolio piece and internship deliverable. The intended reader of the 
 
 Five stages, in order:
 
-1. **Deception layer** — 6 distinct honeypots (Cowrie, Heralding, Wordpot, Elasticpot, ADBHoney, Flask Decoy) facing the internet on an isolated VM.
+1. **Deception layer** — 6 distinct honeypots (Cowrie, Credential Trap, Wordpot, Elasticpot, ADBHoney, Flask Decoy) facing the internet on an isolated VM.
 2. **Session logger (Ingestion Pipeline)** — normalizes all disparate honeypot JSON/CSV logs into a unified, common event format via Python watchdog scripts.
 3. **Relational database** — the normalized SQLite schema in Section 6.
 4. **Analytics engine** — feature extraction, similarity/clustering (Section 7), and rule-based ATT&CK tagging (Section 8).
@@ -145,7 +145,7 @@ Notes: `sources` is split out from `sessions` to avoid repeating IP metadata acr
 
 ## 9. Tech stack
 
-- **Honeypots:** Cowrie (SSH), Heralding (Credentials), Wordpot (WordPress), Elasticpot (DB), ADBHoney (IoT), Flask (Custom).
+- **Honeypots:** Cowrie (SSH), Credential Trap (Credentials), Wordpot (WordPress), Elasticpot (DB), ADBHoney (IoT), Flask (Custom).
 - **Analysis:** Python, pandas, scikit-learn/scipy.
 - **Database:** SQLite to start (matches existing Bartigo experience); migrate to PostgreSQL if session volume grows large.
 - **Dashboard:** Flask + Chart.js.
@@ -179,4 +179,4 @@ Notes: `sources` is split out from `sessions` to avoid repeating IP metadata acr
 
 - Use a small, separately-generated batch of labeled sessions (attacker "personas" you script yourself, with known ground truth) as a calibration set to sanity-check whether MIRAGE's unsupervised clustering approach is actually working before trusting it on real, unlabeled data.
 - A simple classifier distinguishing "likely automated/bot" from "likely human" sessions based on timing regularity, without any model — just statistical thresholds on inter-command timing variance.
-- **(COMPLETED)** Add extensive 3rd-party honeypots (Heralding, Wordpot, etc) to drastically increase surface area.
+- **(COMPLETED)** Add extensive 3rd-party honeypots (Wordpot, Elasticpot, etc) and custom traps to drastically increase surface area.
