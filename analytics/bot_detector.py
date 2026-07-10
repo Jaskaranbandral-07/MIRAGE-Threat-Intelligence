@@ -115,6 +115,11 @@ def classify_session(session_id: int) -> str:
         One of ``'bot'``, ``'human'``, or ``'unknown'``.
     """
     db = get_db()
+    
+    # Fetch protocol
+    row = db.execute('SELECT protocol FROM sessions WHERE session_id = ?', (session_id,)).fetchone()
+    protocol = row['protocol'] if row else 'ssh'
+    
     command_count = _get_command_count(db, session_id)
     times = _get_inter_command_times(db, session_id)
     metrics = _compute_timing_metrics(times)
@@ -122,8 +127,11 @@ def classify_session(session_id: int) -> str:
     cv = metrics['timing_cv']
     avg_ict = metrics['avg_inter_command_time_ms']
 
-    # Not enough data for any classification
+    # Not enough data for statistical classification
     if cv is None or avg_ict is None:
+        # Heuristic for non-interactive honeypot protocols
+        if protocol in ('http', 'wordpress', 'elasticpot', 'adb'):
+            return 'bot'
         logger.debug(
             "Session %d: insufficient timing data (commands=%d) → 'unknown'.",
             session_id, command_count,

@@ -295,3 +295,9 @@ INSERT OR IGNORE INTO technique_signatures (pattern, attack_technique_id, techni
 INSERT OR IGNORE INTO technique_signatures (pattern, attack_technique_id, technique_name) VALUES
 ('LOGIN FAILED:', 'T1110.001', 'Brute Force: Password Guessing');
 
+-- ── Generic Fallbacks ─────────────────────────────────────────────────────────
+
+INSERT OR IGNORE INTO technique_signatures (pattern, attack_technique_id, technique_name) VALUES
+('^(?:GET|POST|PUT|DELETE|HEAD|OPTIONS|TRACE|CONNECT)\s+\/', 'T1595.002', 'Active Scanning: Generic Web Probe');
+
+
