@@ -58,6 +58,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from database.db import get_db, init_db
 from config import Config
+from analytics.attack_tagger import _cache as tagger_cache
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -239,7 +240,7 @@ def _insert_command(db, session_id: int, raw_input: str, ts_iso: str):
     delta_ms = _compute_delta_ms(session_id, ts_iso)
 
     with _db_lock:
-        db.execute(
+        cursor = db.execute(
             """
             INSERT INTO commands
                 (session_id, sequence_number, raw_input, timestamp, time_since_prev_ms)
@@ -247,6 +248,23 @@ def _insert_command(db, session_id: int, raw_input: str, ts_iso: str):
             """,
             (session_id, seq, raw_input, ts_iso, delta_ms),
         )
+        command_id = cursor.lastrowid
+        
+        # Real-time technique tagging
+        patterns = tagger_cache.patterns
+        if patterns:
+            for pat in patterns:
+                if pat['compiled'].search(raw_input):
+                    try:
+                        db.execute(
+                            'INSERT OR IGNORE INTO session_techniques '
+                            '(session_id, signature_id, matched_command_id) '
+                            'VALUES (?, ?, ?)',
+                            (session_id, pat['signature_id'], command_id),
+                        )
+                    except Exception as e:
+                        logger.error("Failed real-time tag: %s", e)
+
         db.commit()
 
     # Update last-timestamp tracker

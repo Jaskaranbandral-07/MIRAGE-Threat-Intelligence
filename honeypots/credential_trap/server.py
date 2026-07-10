@@ -14,6 +14,7 @@ import base64
 import json
 import logging
 import os
+import re
 import signal
 import sys
 from datetime import datetime, timezone
@@ -168,13 +169,20 @@ async def handle_telnet(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
         await writer.drain()
 
         username_data = await asyncio.wait_for(reader.readline(), timeout=60)
-        username = username_data.decode("utf-8", errors="replace").strip() if username_data else ""
+        # Strip Telnet IAC negotiations (0xFF followed by 1 or 2 bytes depending on command)
+        if username_data:
+            username_data = re.sub(b'\xff[\xfb-\xfe].', b'', username_data)
+            username_data = re.sub(b'\xff[\xf0-\xfa]', b'', username_data)
+        username = username_data.decode("utf-8", errors="ignore").strip() if username_data else ""
 
         writer.write(b"Password: ")
         await writer.drain()
 
         password_data = await asyncio.wait_for(reader.readline(), timeout=60)
-        password = password_data.decode("utf-8", errors="replace").strip() if password_data else ""
+        if password_data:
+            password_data = re.sub(b'\xff[\xfb-\xfe].', b'', password_data)
+            password_data = re.sub(b'\xff[\xf0-\xfa]', b'', password_data)
+        password = password_data.decode("utf-8", errors="ignore").strip() if password_data else ""
 
         log_event(
             "login_attempt", src_ip, src_port, "telnet",
