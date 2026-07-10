@@ -39,7 +39,7 @@ def api_stats():
     http_sessions = row['http'] or 0
     
     # Active clusters
-    cursor.execute("SELECT COUNT(*) AS active_clusters FROM clusters WHERE label IS NOT NULL")
+    cursor.execute("SELECT COUNT(DISTINCT cluster_id) AS active_clusters FROM sessions WHERE cluster_id IS NOT NULL")
     active_clusters = cursor.fetchone()['active_clusters'] or 0
     
     # Techniques matched
@@ -206,14 +206,19 @@ def api_clusters():
     cursor = db.cursor()
     
     cursor.execute("""
-        SELECT cluster_id, label, first_seen, last_seen, session_count, centroid_features
+        SELECT cluster_id, label, first_seen, last_seen, centroid_features,
+               (SELECT COUNT(*) FROM sessions s WHERE s.cluster_id = clusters.cluster_id) as actual_count
         FROM clusters
         WHERE label IS NOT NULL
-        ORDER BY session_count DESC
+        ORDER BY actual_count DESC
     """)
     clusters = []
     for row in cursor.fetchall():
+        if row['actual_count'] == 0:
+            continue
+            
         cluster_dict = dict(row)
+        cluster_dict['session_count'] = row['actual_count']
         if cluster_dict['centroid_features']:
             try:
                 cluster_dict['centroid_features'] = json.loads(cluster_dict['centroid_features'])
