@@ -142,6 +142,13 @@ async function loadTimeline() {
             'adb': '#ec4899'
         };
 
+        // Ensure all known protocols exist in datasets so they appear in the legend
+        Object.keys(colors).forEach(proto => {
+            if (!data.datasets[proto]) {
+                data.datasets[proto] = Array(data.labels.length).fill(0);
+            }
+        });
+
         const chartDatasets = Object.keys(data.datasets).map(proto => {
             const baseColor = colors[proto.toLowerCase()] || '#94a3b8';
             
