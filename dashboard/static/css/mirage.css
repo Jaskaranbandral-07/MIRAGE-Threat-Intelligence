@@ -214,7 +214,7 @@ header {
 /* KPI Grid */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
   gap: var(--gap-md);
 }
 
@@ -396,7 +396,7 @@ select:focus {
 /* Campaigns Grid */
 .campaign-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
   gap: var(--gap-md);
 }
 
@@ -561,9 +561,21 @@ tr.row-http { background: rgba(255, 159, 28, 0.02); }
 }
 
 @media (max-width: 768px) {
-  .dashboard-container { padding: calc(60px + var(--gap-md)) var(--gap-md) var(--gap-md); }
+  .dashboard-container { padding: calc(60px + var(--gap-md)) var(--gap-sm) var(--gap-md); gap: var(--gap-md); }
   .modal-content { width: 95%; padding: var(--gap-lg); }
   .logo-text { font-size: 1.25rem; }
+  .kpi-value { font-size: 2rem; }
+  .table-controls { flex-direction: column; gap: var(--gap-sm); align-items: stretch; }
+  header { padding: 0 var(--gap-sm); }
+}
+
+@media (max-width: 480px) {
+  .clock { display: none; }
+  .status-indicator span { display: none; }
+  .kpi-card { padding: var(--gap-sm); gap: var(--gap-sm); }
+  .section-title { font-size: 0.75rem; }
+  .chart-container { height: 300px; padding: var(--gap-sm); }
+  section { padding: var(--gap-sm); }
 }
 
 /* Sections */
