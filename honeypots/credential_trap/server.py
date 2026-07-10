@@ -172,7 +172,7 @@ async def handle_telnet(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
         for _ in range(5):
             username_data = await asyncio.wait_for(reader.readline(), timeout=60)
             if not username_data:
-                break
+                return
             # Strip Telnet IAC negotiations (including subnegotiations)
             cleaned = re.sub(rb'\xff\xfa.*?\xff\xf0', b'', username_data, flags=re.DOTALL)
             cleaned = re.sub(rb'\xff[\xfb-\xfe].', b'', cleaned)
@@ -189,7 +189,7 @@ async def handle_telnet(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
         for _ in range(5):
             password_data = await asyncio.wait_for(reader.readline(), timeout=60)
             if not password_data:
-                break
+                return
             cleaned = re.sub(rb'\xff\xfa.*?\xff\xf0', b'', password_data, flags=re.DOTALL)
             cleaned = re.sub(rb'\xff[\xfb-\xfe].', b'', cleaned)
             cleaned = re.sub(rb'\xff[\xf0-\xfa]', b'', cleaned)
@@ -198,10 +198,11 @@ async def handle_telnet(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
                 password = text
                 break
 
-        log_event(
-            "login_attempt", src_ip, src_port, "telnet",
-            username=username, password=password,
-        )
+        if username or password:
+            log_event(
+                "login_attempt", src_ip, src_port, "telnet",
+                username=username, password=password,
+            )
 
         writer.write(b"\r\nLogin incorrect\r\n")
         await writer.drain()
