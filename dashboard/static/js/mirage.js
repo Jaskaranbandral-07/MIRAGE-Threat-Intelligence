@@ -322,7 +322,7 @@ async function loadSessionsTable() {
                 <td>${formatTime(s.start_time)}</td>
                 <td>${s.is_bot ? createBadge(s.is_bot.toUpperCase(), s.is_bot) : '-'}</td>
                 <td>${s.command_count}</td>
-                <td>${s.cluster_label || '-'}</td>
+                <td>${s.cluster_label || (s.command_count === 0 ? 'Port Scan' : 'Unclustered')}</td>
                 <td><button class="glass-btn" onclick="openSessionDetail(${s.session_id})">View</button></td>
             `;
             tbody.appendChild(tr);
@@ -470,8 +470,8 @@ async function loadCredentials() {
                     <td>${formatTime(c.timestamp)}</td>
                     <td class="code-cell">${c.source_ip}</td>
                     <td>${createBadge(c.protocol.toUpperCase(), c.protocol)}</td>
-                    <td class="code-cell">${c.username || '-'}</td>
-                    <td class="code-cell">${c.password || '-'}</td>
+                    <td class="code-cell">${c.username || '&lt;empty&gt;'}</td>
+                    <td class="code-cell">${c.password || '&lt;empty&gt;'}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -538,7 +538,7 @@ async function openSessionDetail(id) {
             <span>IP: <strong class="code-cell">${data.source_ip}</strong></span>
             <span>Protocol: ${createBadge(data.protocol.toUpperCase(), data.protocol)}</span>
             <span>Duration: <strong>${formatDuration(data.duration_seconds)}</strong></span>
-            <span>Cluster: <strong>${data.cluster_label || 'None'}</strong></span>
+            <span>Cluster: <strong>${data.cluster_label || (data.commands && data.commands.length === 0 ? 'Port Scan' : 'Unclustered')}</strong></span>
         `;
         
         if (data.is_bot) {
@@ -571,6 +571,21 @@ async function openSessionDetail(id) {
                 </div>
             `;
         });
+        
+        if (data.credentials && data.credentials.length > 0) {
+            let credHtml = `<div style="margin-bottom: 1rem; padding: 1rem; background: var(--bg-surface); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">`;
+            credHtml += `<h4 style="margin: 0 0 0.5rem 0; color: var(--text-primary); font-size: 0.9rem;">Credentials Attempted</h4>`;
+            data.credentials.forEach(cred => {
+                credHtml += `<div style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #94a3b8; margin-bottom: 4px;">`;
+                credHtml += `Username: <span style="color: #a5f3fc;">${cred.username || '&lt;empty&gt;'}</span> | `;
+                credHtml += `Password: <span style="color: #fde047;">${cred.password || '&lt;empty&gt;'}</span>`;
+                credHtml += `</div>`;
+            });
+            credHtml += `</div>`;
+            listDiv.innerHTML = credHtml + listDiv.innerHTML;
+        } else if (data.commands.length === 0) {
+            listDiv.innerHTML = `<div style="padding: 2rem; text-align: center; color: #64748b; font-style: italic;">No commands or credentials captured (Port Scan/Connection test)</div>`;
+        }
         
         document.getElementById('session-modal').classList.add('active');
         document.body.style.overflow = 'hidden'; // Prevent background scrolling

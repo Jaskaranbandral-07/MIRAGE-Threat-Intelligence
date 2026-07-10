@@ -190,6 +190,15 @@ def api_session_detail(session_id):
         
     session_dict['commands'] = commands
     
+    # Credentials
+    cursor.execute("""
+        SELECT username, password 
+        FROM credentials 
+        WHERE session_id = ?
+    """, (session_id,))
+    session_dict['credentials'] = [dict(row) for row in cursor.fetchall()]
+
+    
     # Try bot detection
     if HAS_BOT_DETECTION and Config.ENABLE_BOT_DETECTION:
         try:
