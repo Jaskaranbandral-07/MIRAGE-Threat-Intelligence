@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -307,7 +307,7 @@
             <li><span>Core Concepts You Need to Know</span></li>
             <li><span>How the Whole System Works Together</span></li>
             <li><span>Project File Structure</span></li>
-            <li><span>Layer 1: Cowrie SSH Honeypot</span></li>
+            <li><span>Layer 1: The Multi-Honeypot Traps</span></li>
             <li><span>Layer 2: Flask HTTP Decoy</span></li>
             <li><span>Layer 3: Ingestion Engine</span></li>
             <li><span>Layer 4: The Database</span></li>
@@ -337,7 +337,7 @@
 
         <h3>What does MIRAGE actually do?</h3>
         <ol>
-            <li><strong>Sets a trap</strong> — It runs a fake SSH server (like a fake computer login) and a fake website, both exposed to the internet.</li>
+            <li><strong>Sets a trap</strong> — It runs 6 different traps (SSH, FTP, WordPress, Elasticsearch, ADB, etc), both exposed to the internet.</li>
             <li><strong>Attracts attackers</strong> — Hackers and bots that scan the internet discover your server and try to break in.</li>
             <li><strong>Records everything</strong> — Every login attempt, every command they type, every page they visit is silently captured and stored in a database.</li>
             <li><strong>Analyzes the attacks</strong> — A math-based engine groups similar attackers together (clustering) and labels their actions using a global cybersecurity framework (MITRE ATT&CK).</li>
@@ -492,7 +492,7 @@
 │       └── <span class="file">admin.html</span>     <span class="desc">── Fake admin panel</span>
 │
 ├── <span class="folder">ingestion/</span>             <span class="desc">── Reads Cowrie logs into the database</span>
-│   ├── <span class="file">cowrie_watcher.py</span>  <span class="desc">── Watches and parses Cowrie's JSON log</span>
+│   ├── <span class="file">unified_watcher.py</span>  <span class="desc">── Watches and parses the JSON logs</span>
 │   └── <span class="file">Dockerfile</span>         <span class="desc">── Docker build instructions</span>
 │
 ├── <span class="folder">analytics/</span>             <span class="desc">── Math-based analysis of captured data</span>
@@ -522,7 +522,7 @@
     <!-- ═══════════════════════════════════════════════ -->
     <div class="section">
         <span class="section-number">05</span>
-        <h2 class="section-heading">Layer 1: Cowrie SSH Honeypot</h2>
+        <h2 class="section-heading">Layer 1: The Multi-Honeypot Traps</h2>
 
         <p><strong>Cowrie</strong> is an open-source SSH honeypot. It pretends to be a real Linux server. When an attacker connects via SSH and types commands, Cowrie:</p>
 
@@ -539,7 +539,7 @@
             <p>Cowrie is like a <strong>fake ATM machine</strong> set up by police. It looks real, it "accepts" cards, but instead of dispensing money, it silently photographs the thief and records everything they do.</p>
         </div>
 
-        <h3>What does Cowrie's JSON log look like?</h3>
+        <h3>What does the JSON logs look like?</h3>
         <div class="code-block" data-label="cowrie.json">
             <code><span class="comment">// A real attacker trying to log in:</span>
 {"eventid": "<span class="highlight">cowrie.login.success</span>",
@@ -618,7 +618,7 @@
         <span class="section-number">07</span>
         <h2 class="section-heading">Layer 3: Ingestion Engine</h2>
 
-        <p>The <strong>Ingestion Engine</strong> (<code class="inline">cowrie_watcher.py</code>) is a long-running background process that acts as a bridge between Cowrie's JSON log file and the MIRAGE database.</p>
+        <p>The <strong>Ingestion Engine</strong> (<code class="inline">unified_watcher.py</code>) is a long-running background process that acts as a bridge between the JSON logs file and the MIRAGE database.</p>
 
         <h3>What does it do?</h3>
         <ol>
@@ -663,6 +663,7 @@
                 <tr><td><strong>sources</strong></td><td>Every unique IP address that connected</td><td>IP: 185.220.101.45, Country: Russia, First seen: July 9</td></tr>
                 <tr><td><strong>sessions</strong></td><td>Each individual attack session</td><td>Session #42: SSH from 185.220.101.45, lasted 45 seconds</td></tr>
                 <tr><td><strong>commands</strong></td><td>Every command typed by every attacker</td><td>"cat /etc/passwd" — typed 5.2 seconds after previous command</td></tr>
+                <tr><td><strong>credentials</strong></td><td>Passwords captured by honeypots</td><td>admin/123456 attempted on SSH and FTP</td></tr>
                 <tr><td><strong>clusters</strong></td><td>Groups of similar attack sessions</td><td>Cluster "Botnet-Alpha": 20 sessions with same commands</td></tr>
                 <tr><td><strong>technique_signatures</strong></td><td>30 regex patterns for known attack techniques</td><td>Pattern: "cat /etc/passwd" → ATT&CK T1003.008</td></tr>
                 <tr><td><strong>session_techniques</strong></td><td>Links sessions to the techniques they used</td><td>Session #42 used techniques T1003.008 and T1082</td></tr>
@@ -938,3 +939,4 @@
 </div>
 </body>
 </html>
+
