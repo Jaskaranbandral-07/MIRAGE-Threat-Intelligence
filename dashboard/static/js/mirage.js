@@ -11,10 +11,12 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(updateClock, 1000);
     
     // Set global Chart.js defaults
+    const isMobile = window.innerWidth < 768;
     Chart.defaults.color = '#94a3b8';
     Chart.defaults.font.family = "'Inter', sans-serif";
     Chart.defaults.plugins.legend.labels.usePointStyle = true;
-    Chart.defaults.plugins.legend.labels.padding = 20;
+    Chart.defaults.plugins.legend.labels.padding = isMobile ? 10 : 20;
+    Chart.defaults.plugins.legend.labels.font = { size: isMobile ? 10 : 12, family: "'Inter', sans-serif" };
     Chart.defaults.elements.line.tension = 0.4;
     Chart.defaults.scale.grid.color = 'rgba(255,255,255,0.04)';
     
@@ -187,7 +189,7 @@ async function loadTimeline() {
                 responsive: true,
                 maintainAspectRatio: false,
                 interaction: { mode: 'index', intersect: false },
-                plugins: { legend: { position: 'top' } }
+                plugins: { legend: { position: window.innerWidth < 768 ? 'bottom' : 'top' } }
             }
         });
     } catch (e) { console.error('Error loading timeline:', e); }
