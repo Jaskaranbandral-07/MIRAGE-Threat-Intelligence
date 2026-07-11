@@ -197,7 +197,20 @@ async function loadTimeline() {
                 responsive: true,
                 maintainAspectRatio: false,
                 interaction: { mode: 'index', intersect: false },
-                plugins: { legend: { position: window.innerWidth < 768 ? 'bottom' : 'top' } }
+                plugins: { 
+                    legend: { position: window.innerWidth < 768 ? 'bottom' : 'top' },
+                    zoom: {
+                        zoom: {
+                            wheel: { enabled: true },
+                            pinch: { enabled: true },
+                            mode: 'x',
+                        },
+                        pan: {
+                            enabled: true,
+                            mode: 'x',
+                        }
+                    }
+                }
             }
         });
     } catch (e) { console.error('Error loading timeline:', e); }

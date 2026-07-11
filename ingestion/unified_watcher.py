@@ -235,7 +235,15 @@ def _close_session(db, session_id: int, end_iso: str, start_iso: str | None):
 
 
 def _insert_command(db, session_id: int, raw_input: str, ts_iso: str):
-    """Record a single command for the given session."""
+    """Record a single command for the given session, filtering out garbage."""
+    # Filter 1: Empty or whitespace-only commands
+    if not raw_input.strip():
+        return
+        
+    # Filter 2: High percentage of non-printable characters (binary noise like Telnet negotiation)
+    non_printable = sum(1 for c in raw_input if not (32 <= ord(c) <= 126 or c in '\r\n\t'))
+    if len(raw_input) > 0 and (non_printable / len(raw_input)) > 0.5:
+        return
     seq = _next_seq(session_id)
     delta_ms = _compute_delta_ms(session_id, ts_iso)
 
