@@ -57,6 +57,10 @@ document.addEventListener('DOMContentLoaded', () => {
         loadSessionsTable();
     });
     
+    document.getElementById('btn-export-csv').addEventListener('click', () => {
+        window.location.href = '/api/export/csv';
+    });
+    
     // Setup SSE for live feed if enabled, otherwise poll
     setupLiveFeed();
 });

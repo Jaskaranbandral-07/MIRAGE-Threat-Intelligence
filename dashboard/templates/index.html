@@ -182,7 +182,11 @@
                     <option value="elasticsearch">Elasticsearch</option>
                     <option value="adb">ADB</option>
                 </select>
-                <input type="text" id="filter-ip" placeholder="Search by IP..." style="padding:0.5rem 1rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:white; border-radius:4px; margin-right:auto; margin-left:1rem; outline:none;" />
+                <input type="text" id="filter-ip" placeholder="Search by IP..." style="padding:0.5rem 1rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:white; border-radius:4px; margin-right:1rem; margin-left:1rem; outline:none;" />
+                <button id="btn-export-csv" class="glass-btn" style="margin-right:auto; background:rgba(124, 58, 237, 0.2); border-color:#7c3aed; display:flex; align-items:center; gap:0.5rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Download CSV
+                </button>
                 <div class="pagination">
                     <button class="glass-btn" id="btn-prev-page">Previous</button>
                     <span id="page-indicator">Page 1 of 1</span>

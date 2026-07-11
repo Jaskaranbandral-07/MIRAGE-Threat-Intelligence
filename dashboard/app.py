@@ -2,6 +2,8 @@ import sys
 import os
 import time
 import json
+import csv
+import io
 from flask import Flask, render_template, request, jsonify, Response
 from flask_cors import CORS
 
@@ -140,6 +142,66 @@ def api_sessions():
         "page": page,
         "pages": (total + per_page - 1) // per_page
     })
+
+@app.route('/api/export/csv')
+def export_csv():
+    db = get_db()
+    cursor = db.cursor()
+    
+    # Query high-value intelligence data
+    query = """
+        SELECT 
+            s.session_id, 
+            s.source_ip, 
+            s.protocol, 
+            s.start_time, 
+            s.duration_seconds,
+            IFNULL(c.username, '') as compromised_username,
+            IFNULL(c.password, '') as compromised_password,
+            (SELECT COUNT(*) FROM commands cmd WHERE cmd.session_id = s.session_id) as command_count,
+            IFNULL(GROUP_CONCAT(DISTINCT st.technique_id), 'None') as attack_techniques
+        FROM sessions s
+        LEFT JOIN credentials c ON s.session_id = c.session_id
+        LEFT JOIN session_techniques st ON s.session_id = st.session_id
+        GROUP BY s.session_id
+        ORDER BY s.start_time DESC
+    """
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    
+    # Generate CSV in memory
+    si = io.StringIO()
+    cw = csv.writer(si)
+    cw.writerow(['Session ID', 'Source IP', 'Protocol', 'Start Time', 'Duration (s)', 'Compromised Username', 'Compromised Password', 'Command Count', 'Attack Techniques', 'Bot Classification'])
+    
+    for row in rows:
+        is_bot = 'unknown'
+        if HAS_BOT_DETECTION and Config.ENABLE_BOT_DETECTION:
+            try:
+                from analytics.bot_detector import classify_session
+                is_bot = classify_session(row['session_id'])
+            except Exception:
+                pass
+                
+        cw.writerow([
+            row['session_id'],
+            row['source_ip'],
+            row['protocol'],
+            row['start_time'],
+            row['duration_seconds'],
+            row['compromised_username'],
+            row['compromised_password'],
+            row['command_count'],
+            row['attack_techniques'],
+            is_bot
+        ])
+        
+    output = si.getvalue()
+    return Response(
+        output,
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment;filename=mirage_threat_intel.csv"}
+    )
 
 @app.route('/api/sessions/<int:session_id>')
 def api_session_detail(session_id):
