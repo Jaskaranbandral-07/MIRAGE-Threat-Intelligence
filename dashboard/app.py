@@ -82,6 +82,7 @@ def api_sessions():
     per_page = int(request.args.get('per_page', 20))
     protocol = request.args.get('protocol')
     cluster_id = request.args.get('cluster_id')
+    ip_search = request.args.get('ip')
     
     offset = (page - 1) * per_page
     
@@ -105,6 +106,9 @@ def api_sessions():
     if cluster_id:
         query += " AND s.cluster_id = ?"
         params.append(cluster_id)
+    if ip_search:
+        query += " AND s.source_ip LIKE ?"
+        params.append(f"%{ip_search}%")
         
     # Get total
     count_query = f"SELECT COUNT(*) as total FROM ({query})"

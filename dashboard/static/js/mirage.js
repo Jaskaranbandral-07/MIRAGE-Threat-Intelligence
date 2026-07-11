@@ -1,6 +1,7 @@
 // Global State
 let currentPage = 1;
 let currentProtocolFilter = '';
+let currentIpFilter = '';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Elements
@@ -46,6 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById('filter-protocol').addEventListener('change', (e) => {
         currentProtocolFilter = e.target.value;
+        currentPage = 1;
+        loadSessionsTable();
+    });
+    
+    document.getElementById('filter-ip').addEventListener('input', (e) => {
+        currentIpFilter = e.target.value.trim();
         currentPage = 1;
         loadSessionsTable();
     });
@@ -327,6 +334,7 @@ async function loadSessionsTable() {
     try {
         const query = new URLSearchParams({ page: currentPage, per_page: 20 });
         if (currentProtocolFilter) query.append('protocol', currentProtocolFilter);
+        if (currentIpFilter) query.append('ip', currentIpFilter);
         
         const res = await fetch(`/api/sessions?${query}`);
         const data = await res.json();
