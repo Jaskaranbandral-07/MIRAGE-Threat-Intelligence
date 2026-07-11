@@ -159,10 +159,11 @@ def export_csv():
             IFNULL(c.username, '') as compromised_username,
             IFNULL(c.password, '') as compromised_password,
             (SELECT COUNT(*) FROM commands cmd WHERE cmd.session_id = s.session_id) as command_count,
-            IFNULL(GROUP_CONCAT(DISTINCT st.technique_id), 'None') as attack_techniques
+            IFNULL(GROUP_CONCAT(DISTINCT ts.technique_name), 'None') as attack_techniques
         FROM sessions s
         LEFT JOIN credentials c ON s.session_id = c.session_id
         LEFT JOIN session_techniques st ON s.session_id = st.session_id
+        LEFT JOIN technique_signatures ts ON st.signature_id = ts.signature_id
         GROUP BY s.session_id
         ORDER BY s.start_time DESC
     """
