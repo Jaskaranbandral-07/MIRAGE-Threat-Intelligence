@@ -71,7 +71,15 @@ function formatDuration(seconds) {
 
 function formatTime(isoStr) {
     if (!isoStr) return '';
-    return isoStr.replace('T', ' ').substring(0, 19);
+    let dStr = isoStr.replace(' ', 'T');
+    if (!dStr.endsWith('Z')) dStr += 'Z';
+    const d = new Date(dStr);
+    if (isNaN(d)) return isoStr.replace('T', ' ').substring(0, 19);
+    
+    return d.toLocaleString('en-CA', { 
+        timeZone: 'Asia/Kolkata', 
+        hour12: false 
+    }).replace(', ', ' ');
 }
 
 function createBadge(text, type) {
